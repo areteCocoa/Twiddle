@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--Tab Bar Controller-->
@@ -31,16 +32,54 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="text_cell" rowHeight="107" id="Acd-Qv-9DB">
-                                <rect key="frame" x="0.0" y="92" width="600" height="107"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="text_cell" rowHeight="116" id="Acd-Qv-9DB" customClass="TweetTextTableViewCell">
+                                <rect key="frame" x="0.0" y="92" width="600" height="116"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Acd-Qv-9DB" id="dqT-vW-fkm">
-                                    <rect key="frame" x="0.0" y="0.0" width="600" height="107"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="600" height="116"/>
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <textView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="749" bounces="NO" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="wJJ-vy-UUs">
+                                            <rect key="frame" x="23" y="0.0" width="511" height="83"/>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                        </textView>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="473-5d-IVZ">
+                                            <rect key="frame" x="542" y="33" width="50" height="50"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="50" id="PHg-GH-fSe"/>
+                                                <constraint firstAttribute="width" constant="50" id="w1Z-xe-s7q"/>
+                                            </constraints>
+                                        </imageView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" text="Username" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X8S-Iu-moI">
+                                            <rect key="frame" x="8" y="91" width="584" height="17"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="wJJ-vy-UUs" firstAttribute="leading" secondItem="dqT-vW-fkm" secondAttribute="leadingMargin" constant="15" id="BKy-DH-UhE"/>
+                                        <constraint firstItem="X8S-Iu-moI" firstAttribute="top" secondItem="wJJ-vy-UUs" secondAttribute="bottom" constant="8" id="BVO-mt-z20"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="X8S-Iu-moI" secondAttribute="trailing" id="JBZ-d1-6Df"/>
+                                        <constraint firstAttribute="topMargin" secondItem="wJJ-vy-UUs" secondAttribute="top" constant="8" id="Wpa-y1-ZIe"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="473-5d-IVZ" secondAttribute="trailing" id="f5o-pM-GdJ"/>
+                                        <constraint firstAttribute="leadingMargin" secondItem="X8S-Iu-moI" secondAttribute="leading" id="fGd-Ol-ab2"/>
+                                        <constraint firstItem="473-5d-IVZ" firstAttribute="centerY" secondItem="dqT-vW-fkm" secondAttribute="centerY" id="fTf-EV-fCl"/>
+                                        <constraint firstItem="473-5d-IVZ" firstAttribute="leading" secondItem="wJJ-vy-UUs" secondAttribute="trailing" constant="8" id="n1w-sZ-MLA"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="X8S-Iu-moI" secondAttribute="bottom" id="zpI-nd-0B7"/>
+                                    </constraints>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="tweetTextView" destination="wJJ-vy-UUs" id="2Iy-XW-cGr"/>
+                                    <outlet property="userAvatarImageView" destination="473-5d-IVZ" id="KRz-OU-hik"/>
+                                    <outlet property="usernameLabel" destination="X8S-Iu-moI" id="9Up-94-XVW"/>
+                                </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="image_cell" id="ehr-4J-3aN">
-                                <rect key="frame" x="0.0" y="199" width="600" height="44"/>
+                                <rect key="frame" x="0.0" y="208" width="600" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ehr-4J-3aN" id="IE8-zK-b0q">
                                     <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
@@ -54,6 +93,12 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Root View Controller" id="jYv-3O-bMQ"/>
+                    <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="0NV-H4-dyG">
+                        <autoresizingMask key="autoresizingMask"/>
+                        <connections>
+                            <action selector="refresh:" destination="4qy-RT-iRL" eventType="primaryActionTriggered" id="Yaa-at-Ve2"/>
+                        </connections>
+                    </refreshControl>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UcP-Fe-gCy" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

@@ -21,6 +21,8 @@
 		549D87631D17EF420068DD85 /* TwitterCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 549D87601D17EF420068DD85 /* TwitterCore.framework */; };
 		549D87661D17EFA50068DD85 /* MoPub.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 549D87641D17EFA50068DD85 /* MoPub.framework */; };
 		549D87671D17EFA50068DD85 /* MoPub.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 549D87651D17EFA50068DD85 /* MoPub.bundle */; };
+		54D585721D187757008564F1 /* UserTimeline.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D585711D187757008564F1 /* UserTimeline.m */; };
+		54D585781D187DB1008564F1 /* TweetTextTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D585771D187DB1008564F1 /* TweetTextTableViewCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +56,10 @@
 		549D87601D17EF420068DD85 /* TwitterCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TwitterCore.framework; sourceTree = "<group>"; };
 		549D87641D17EFA50068DD85 /* MoPub.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MoPub.framework; sourceTree = "<group>"; };
 		549D87651D17EFA50068DD85 /* MoPub.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = MoPub.bundle; path = MoPub.framework/Versions/A/Resources/MoPub.bundle; sourceTree = "<group>"; };
+		54D585701D187757008564F1 /* UserTimeline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserTimeline.h; sourceTree = "<group>"; };
+		54D585711D187757008564F1 /* UserTimeline.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserTimeline.m; sourceTree = "<group>"; };
+		54D585761D187DB1008564F1 /* TweetTextTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetTextTableViewCell.h; sourceTree = "<group>"; };
+		54D585771D187DB1008564F1 /* TweetTextTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TweetTextTableViewCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +118,10 @@
 				541F6D991D17086900740086 /* Main.storyboard */,
 				541F6D9B1D1708D500740086 /* TimelineTableViewController.h */,
 				541F6D9C1D1708D500740086 /* TimelineTableViewController.m */,
+				54D585761D187DB1008564F1 /* TweetTextTableViewCell.h */,
+				54D585771D187DB1008564F1 /* TweetTextTableViewCell.m */,
+				54D585701D187757008564F1 /* UserTimeline.h */,
+				54D585711D187757008564F1 /* UserTimeline.m */,
 				541F6D801D1706BB00740086 /* Assets.xcassets */,
 				541F6D821D1706BB00740086 /* LaunchScreen.storyboard */,
 				541F6D851D1706BB00740086 /* Info.plist */,
@@ -259,6 +269,8 @@
 				541F6D761D1706BB00740086 /* AppDelegate.m in Sources */,
 				541F6D9D1D1708D500740086 /* TimelineTableViewController.m in Sources */,
 				541F6D731D1706BB00740086 /* main.m in Sources */,
+				54D585781D187DB1008564F1 /* TweetTextTableViewCell.m in Sources */,
+				54D585721D187757008564F1 /* UserTimeline.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
