@@ -84,6 +84,12 @@ static CGFloat imageCellHeight = 150;
         textCell.userAvatarImageView.image = [self.imageCache objectForKey:userID];
     }
     
+    if (indexPath.row % 2 == 1) {
+        textCell.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
+    } else {
+        textCell.backgroundColor = [UIColor colorWithWhite:1.0 alpha:1.0];
+    }
+    
     return cell;
 }
 
