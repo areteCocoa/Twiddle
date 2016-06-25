@@ -23,8 +23,6 @@ static CGFloat imageCellHeight = 150;
 
 @property (nonatomic, retain) NSMutableDictionary<NSNumber *, UIImage *> * imageCache;
 
-@property (nonatomic, retain) NSMutableDictionary<NSNumber *, NSMutableArray<NSIndexPath *> *> * indexPathsForUserID;
-
 @end
 
 @implementation TimelineTableViewController
