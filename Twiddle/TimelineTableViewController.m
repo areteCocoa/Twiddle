@@ -32,6 +32,8 @@ static CGFloat imageCellHeight = 150;
     
     self.view.backgroundColor = [UIColor blueColor];
     
+    self.imageCache = [[NSMutableDictionary alloc] init];
+    
     self.timeline = [[UserTimeline alloc] init];
     self.timeline.delegate = self;
     
@@ -72,10 +74,14 @@ static CGFloat imageCellHeight = 150;
     // Setup properties
     textCell.usernameLabel.text = tweet[@"user"][@"name"];
     textCell.tweetTextView.text = tweet[@"text"];
-    textCell.userAvatarImageView.image = [self.imageCache objectForKey:userID];
     
-    if (textCell.userAvatarImageView.image == nil) {
+    UIImage * userAvatarImage = [self.imageCache objectForKey: userID];
+    if(userAvatarImage == nil) {
+        NSLog(@"Tweet cell has all the information but the profile image is not downloaded!");
         [self.timeline getProfilePictureForUserID: tweet[@"user"][@"id"]];
+    } else {
+        NSLog(@"WE DID IT!");
+        textCell.userAvatarImageView.image = [self.imageCache objectForKey:userID];
     }
     
     return cell;
@@ -101,7 +107,10 @@ static CGFloat imageCellHeight = 150;
     [self.imageCache setObject:image forKey:userID];
     
     NSLog(@"Image data converted to UIImage and cached");
-    [self.tableView reloadData];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{ // Make sure it happens on the main thread
+        [self.tableView reloadData];
+    });
 }
 
 #pragma mark - IBActions

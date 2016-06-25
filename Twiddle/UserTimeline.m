@@ -59,7 +59,7 @@
     NSData * imageData = [self.mutableImageData objectForKey:userID];
     if (imageData != nil) {
         // We have the data already, return it through the delegate
-        NSLog(@"Requested cached profile picture, returning without session request.");
+        NSLog(@"Requested cached profile image, returning without session request.");
         [self.delegate timeline:self didFinishDownloadingProfileImageData:[imageData copy] forUserID:userID];
         return;
     }
@@ -67,9 +67,11 @@
     // Check if we have the user data cached already
     NSDictionary * user = [self.mutableUserCache objectForKey:userID];
     if (user != nil) {
-        // We have the user but not the image; download the image now
-        [self downloadProfileImageForUserID:userID withProfileImageURL: user[@"profile_image_url_https"]];
-        return;
+        if ([self.mutableImageData objectForKey: user[@"id"]] == 0) {
+            // We have the user but not the image; download the image now
+            [self downloadProfileImageForUserID:userID withProfileImageURL: user[@"profile_image_url_https"]];
+            return;
+        }
     }
     
     // Get the user we're looking for
