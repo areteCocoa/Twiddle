@@ -17,10 +17,13 @@ static NSString * imageCellReuse = @"image_cell";
 static CGFloat textCellHeight = 120;
 static CGFloat imageCellHeight = 150;
 
-
 @interface TimelineTableViewController () <UserTimelineDelegate>
 
 @property (nonatomic, retain) UserTimeline * timeline;
+
+@property (nonatomic, retain) NSMutableDictionary<NSNumber *, UIImage *> * imageCache;
+
+@property (nonatomic, retain) NSMutableDictionary<NSNumber *, NSMutableArray<NSIndexPath *> *> * indexPathsForUserID;
 
 @end
 
@@ -61,6 +64,8 @@ static CGFloat imageCellHeight = 150;
     
     // Configure the cell...
     NSDictionary * tweet = self.timeline.tweets[indexPath.row];
+    NSNumber * userID = tweet[@"user"][@"id"];
+    
     TweetTextTableViewCell * textCell = (TweetTextTableViewCell *)cell;
     
     // Setup properties of views
@@ -69,11 +74,17 @@ static CGFloat imageCellHeight = 150;
     // Setup properties
     textCell.usernameLabel.text = tweet[@"user"][@"name"];
     textCell.tweetTextView.text = tweet[@"text"];
+    textCell.userAvatarImageView.image = [self.imageCache objectForKey:userID];
+    
+    if (textCell.userAvatarImageView.image == nil) {
+        [self.timeline getProfilePictureForUserID: tweet[@"user"][@"id"]];
+    }
     
     return cell;
 }
 
 #pragma mark - UserTimelineDelegate
+
 - (void)timeline:(UserTimeline *)timeline didFinishGettingTweets:(NSArray *)tweets {
     [self.tableView reloadData];
 }
@@ -82,6 +93,17 @@ static CGFloat imageCellHeight = 150;
     if (!error) {
         [timeline getTimeline];
     }
+}
+
+- (void)timeline:(UserTimeline *)timeline didFinishDownloadingProfileImageData:(NSData *)imageData forUserID:(NSNumber *)userID {
+    NSLog(@"VC received image data for ID %@", userID);
+    
+    UIImage * image = [UIImage imageWithData:imageData];
+    
+    [self.imageCache setObject:image forKey:userID];
+    
+    NSLog(@"Image data converted to UIImage and cached");
+    [self.tableView reloadData];
 }
 
 #pragma mark - IBActions

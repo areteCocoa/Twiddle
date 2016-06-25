@@ -19,7 +19,10 @@
 @property (nonatomic, readonly) BOOL loggedIn;
 
 - (void)login;
+
 - (void)getTimeline;
+
+- (void)getProfilePictureForUserID: (NSNumber *)userID;
 
 @end
 
@@ -30,5 +33,7 @@
 - (void)timeline:(UserTimeline *) timeline didLoginWithError: (NSError *)error;
 
 - (void)timeline:(UserTimeline *) timeline didFinishGettingTweets: (NSArray *)tweets;
+
+- (void)timeline:(UserTimeline *) timeline didFinishDownloadingProfileImageData: (NSData *)imageData forUserID: (NSNumber *)userID;
 
 @end
