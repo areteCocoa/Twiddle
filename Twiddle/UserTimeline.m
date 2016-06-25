@@ -127,7 +127,15 @@
     TWTRAPIClient * client = [[TWTRAPIClient alloc] initWithUserID: userID];
     
     NSString *statusesShowEndpoint = @"https://api.twitter.com/1.1/statuses/home_timeline.json";
-    NSDictionary *params = @{};
+    
+    NSMutableDictionary * params = [[NSMutableDictionary alloc] init];
+    [params setObject:@"20" forKey:@"count"];
+//    if (self.mutableTweets.count == 0) { // Inital load for tweets
+//        [params setObject:@"" forKey:@""];
+//    } else { // Not inital load for tweets
+//        [params setObject:@"" forKey:@""];
+//    }
+    
     NSError *clientError;
     
     NSURLRequest *request = [client URLRequestWithMethod:@"GET" URL:statusesShowEndpoint parameters:params error:&clientError];

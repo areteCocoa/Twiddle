@@ -13,9 +13,16 @@
 
 static NSString * textCellReuse = @"text_cell";
 static NSString * imageCellReuse = @"image_cell";
+static NSString * loadMoreReuse = @"load_more_cell";
 
 static CGFloat textCellHeight = 120;
-static CGFloat imageCellHeight = 150;
+// static CGFloat imageCellHeight = 150;
+static CGFloat loadMoreCellHeight = 40;
+
+typedef enum : NSUInteger {
+    TweetsSection,
+    LoadMoreSection,
+} TimelineTableViewControllerSection;
 
 @interface TimelineTableViewController () <UserTimelineDelegate>
 
@@ -45,52 +52,74 @@ static CGFloat imageCellHeight = 150;
     // Dispose of any resources that can be recreated.
 }
 
+- (void)loadMoreTweets {
+    NSLog(@"Time to load more tweets!");
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
+    return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.timeline.tweets.count;
+    if (section == TweetsSection) {
+        return self.timeline.tweets.count;
+    } else if (section == LoadMoreSection) {
+        if (self.timeline.tweets.count == 0) {
+            return 0;
+        }
+        return 1;
+    }
+    return 0;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return textCellHeight;
+    if (indexPath.section == TweetsSection) {
+        return textCellHeight;
+    } else if (indexPath.section == LoadMoreSection) {
+        return loadMoreCellHeight;
+    }
+    return 0;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:textCellReuse forIndexPath:indexPath];
-    
-    // Configure the cell...
-    NSDictionary * tweet = self.timeline.tweets[indexPath.row];
-    NSNumber * userID = tweet[@"user"][@"id"];
-    
-    TweetTextTableViewCell * textCell = (TweetTextTableViewCell *)cell;
-    
-    // Setup properties of views
-    [textCell.tweetTextView setFont:[UIFont systemFontOfSize: 17.0]];
-    
-    // Setup properties
-    textCell.usernameLabel.text = tweet[@"user"][@"name"];
-    textCell.tweetTextView.text = tweet[@"text"];
-    
-    UIImage * userAvatarImage = [self.imageCache objectForKey: userID];
-    if(userAvatarImage == nil) {
-        NSLog(@"Tweet cell has all the information but the profile image is not downloaded!");
-        [self.timeline getProfilePictureForUserID: tweet[@"user"][@"id"]];
-    } else {
-        NSLog(@"WE DID IT!");
-        textCell.userAvatarImageView.image = [self.imageCache objectForKey:userID];
+    if (indexPath.section == TweetsSection) {
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:textCellReuse forIndexPath:indexPath];
+        
+        // Configure the cell...
+        NSDictionary * tweet = self.timeline.tweets[indexPath.row];
+        NSNumber * userID = tweet[@"user"][@"id"];
+        
+        TweetTextTableViewCell * textCell = (TweetTextTableViewCell *)cell;
+        
+        // Setup properties
+        textCell.usernameLabel.text = tweet[@"user"][@"name"];
+        textCell.tweetTextView.text = tweet[@"text"];
+        
+        UIImage * userAvatarImage = [self.imageCache objectForKey: userID];
+        if(userAvatarImage == nil) {
+            [self.timeline getProfilePictureForUserID: tweet[@"user"][@"id"]];
+        } else {
+            textCell.userAvatarImageView.image = [self.imageCache objectForKey:userID];
+        }
+        
+        if (indexPath.row % 2 == 1) {
+            textCell.backgroundColor = [UIColor colorWithWhite:0.97 alpha:1.0];
+        } else {
+            textCell.backgroundColor = [UIColor colorWithWhite:1.0 alpha:1.0];
+        }
+        
+        return cell;
+    } else if (indexPath.section == LoadMoreSection) {
+        UITableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:loadMoreReuse forIndexPath:indexPath];
+        
+        [self loadMoreTweets];
+        
+        return cell;
     }
     
-    if (indexPath.row % 2 == 1) {
-        textCell.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
-    } else {
-        textCell.backgroundColor = [UIColor colorWithWhite:1.0 alpha:1.0];
-    }
-    
-    return cell;
+    return nil;
 }
 
 #pragma mark - UserTimelineDelegate
@@ -106,13 +135,9 @@ static CGFloat imageCellHeight = 150;
 }
 
 - (void)timeline:(UserTimeline *)timeline didFinishDownloadingProfileImageData:(NSData *)imageData forUserID:(NSNumber *)userID {
-    NSLog(@"VC received image data for ID %@", userID);
-    
     UIImage * image = [UIImage imageWithData:imageData];
     
     [self.imageCache setObject:image forKey:userID];
-    
-    NSLog(@"Image data converted to UIImage and cached");
     
     dispatch_async(dispatch_get_main_queue(), ^{ // Make sure it happens on the main thread
         [self.tableView reloadData];
