@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		540A5EA81D1E927F0042E553 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 540A5EA71D1E927F0042E553 /* CoreData.framework */; };
+		540A5EAB1D1E93240042E553 /* TweetCache.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 540A5EA91D1E93240042E553 /* TweetCache.xcdatamodeld */; };
 		541F6D731D1706BB00740086 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 541F6D721D1706BB00740086 /* main.m */; };
 		541F6D761D1706BB00740086 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 541F6D751D1706BB00740086 /* AppDelegate.m */; };
 		541F6D811D1706BB00740086 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 541F6D801D1706BB00740086 /* Assets.xcassets */; };
@@ -36,6 +38,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		540A5EA71D1E927F0042E553 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		540A5EAA1D1E93240042E553 /* TweetCache.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TweetCache.xcdatamodel; sourceTree = "<group>"; };
 		541F6D6E1D1706BB00740086 /* Twiddle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Twiddle.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		541F6D721D1706BB00740086 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		541F6D741D1706BB00740086 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -67,6 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				540A5EA81D1E927F0042E553 /* CoreData.framework in Frameworks */,
 				549D875D1D17EED40068DD85 /* Crashlytics.framework in Frameworks */,
 				549D87631D17EF420068DD85 /* TwitterCore.framework in Frameworks */,
 				549D875C1D17EED40068DD85 /* Fabric.framework in Frameworks */,
@@ -88,6 +93,7 @@
 		541F6D651D1706BB00740086 = {
 			isa = PBXGroup;
 			children = (
+				540A5EA71D1E927F0042E553 /* CoreData.framework */,
 				549D87641D17EFA50068DD85 /* MoPub.framework */,
 				549D87651D17EFA50068DD85 /* MoPub.bundle */,
 				549D875E1D17EF420068DD85 /* TwitterKit.framework */,
@@ -115,6 +121,7 @@
 			children = (
 				541F6D741D1706BB00740086 /* AppDelegate.h */,
 				541F6D751D1706BB00740086 /* AppDelegate.m */,
+				540A5EA91D1E93240042E553 /* TweetCache.xcdatamodeld */,
 				541F6D991D17086900740086 /* Main.storyboard */,
 				541F6D9B1D1708D500740086 /* TimelineTableViewController.h */,
 				541F6D9C1D1708D500740086 /* TimelineTableViewController.m */,
@@ -268,6 +275,7 @@
 			files = (
 				541F6D761D1706BB00740086 /* AppDelegate.m in Sources */,
 				541F6D9D1D1708D500740086 /* TimelineTableViewController.m in Sources */,
+				540A5EAB1D1E93240042E553 /* TweetCache.xcdatamodeld in Sources */,
 				541F6D731D1706BB00740086 /* main.m in Sources */,
 				54D585781D187DB1008564F1 /* TweetTextTableViewCell.m in Sources */,
 				54D585721D187757008564F1 /* UserTimeline.m in Sources */,
@@ -471,6 +479,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		540A5EA91D1E93240042E553 /* TweetCache.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				540A5EAA1D1E93240042E553 /* TweetCache.xcdatamodel */,
+			);
+			currentVersion = 540A5EAA1D1E93240042E553 /* TweetCache.xcdatamodel */;
+			path = TweetCache.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 541F6D661D1706BB00740086 /* Project object */;
 }
