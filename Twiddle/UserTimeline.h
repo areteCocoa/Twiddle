@@ -20,7 +20,9 @@
 
 - (void)login;
 
-- (void)getTimeline;
+- (void)getInitalTimeline;
+
+- (void)getMoreTimeline;
 
 - (void)getProfilePictureForUserID: (NSNumber *)userID;
 
@@ -32,7 +34,9 @@
 
 - (void)timeline:(UserTimeline *) timeline didLoginWithError: (NSError *)error;
 
-- (void)timeline:(UserTimeline *) timeline didFinishGettingTweets: (NSArray *)tweets;
+- (void)timeline:(UserTimeline *) timeline didGetInitalTimeline: (NSArray *)tweets;
+
+- (void)timeline: (UserTimeline *) timeline didUpdateTimeline: (NSArray*)newTweets;
 
 - (void)timeline:(UserTimeline *) timeline didFinishDownloadingProfileImageData: (NSData *)imageData forUserID: (NSNumber *)userID;
 
