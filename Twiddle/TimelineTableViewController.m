@@ -53,7 +53,7 @@ typedef enum : NSUInteger {
 }
 
 - (void)loadMoreTweets {
-    NSLog(@"Time to load more tweets!");
+    [self.timeline getMoreTimeline];
 }
 
 #pragma mark - Table view data source
@@ -124,14 +124,18 @@ typedef enum : NSUInteger {
 
 #pragma mark - UserTimelineDelegate
 
-- (void)timeline:(UserTimeline *)timeline didFinishGettingTweets:(NSArray *)tweets {
+- (void)timeline:(UserTimeline *)timeline didLoginWithError:(NSError *)error {
+    if (!error) {
+        [timeline getInitalTimeline];
+    }
+}
+
+- (void)timeline:(UserTimeline *)timeline didGetInitalTimeline:(NSArray *)tweets {
     [self.tableView reloadData];
 }
 
-- (void)timeline:(UserTimeline *)timeline didLoginWithError:(NSError *)error {
-    if (!error) {
-        [timeline getTimeline];
-    }
+- (void)timeline:(UserTimeline *)timeline didUpdateTimeline:(NSArray *)newTweets {
+    [self.tableView reloadData];
 }
 
 - (void)timeline:(UserTimeline *)timeline didFinishDownloadingProfileImageData:(NSData *)imageData forUserID:(NSNumber *)userID {
