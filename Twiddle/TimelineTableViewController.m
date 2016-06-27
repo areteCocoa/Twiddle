@@ -17,7 +17,6 @@ static NSString * imageCellReuse = @"image_cell";
 static NSString * loadMoreReuse = @"load_more_cell";
 
 static CGFloat textCellHeight = 120;
-static CGFloat imageCellHeight = 150;
 static CGFloat loadMoreCellHeight = 40;
 
 typedef enum : NSUInteger {
@@ -29,7 +28,9 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, retain) UserTimeline * timeline;
 
-@property (nonatomic, retain) NSMutableDictionary<NSNumber *, UIImage *> * imageCache;
+@property (nonatomic, retain) NSMutableDictionary<NSNumber *, UIImage *> * userProfileImageCache;
+
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, UIImage *> * imageCache;
 
 @end
 
@@ -40,7 +41,8 @@ typedef enum : NSUInteger {
     
     self.view.backgroundColor = [UIColor blueColor];
     
-    self.imageCache = [[NSMutableDictionary alloc] init];
+    self.userProfileImageCache = [[NSMutableDictionary alloc] init];
+	self.imageCache = [NSMutableDictionary dictionary];
     
     self.timeline = [[UserTimeline alloc] init];
     self.timeline.delegate = self;
@@ -86,12 +88,8 @@ typedef enum : NSUInteger {
 			if ([[tweet[@"entities"][@"media"] firstObject][@"type"] isEqualToString:@"photo"]) {
 				// It is an image and we need to calculate the height given the screen width
 				NSDictionary * imageSizes = [tweet[@"entities"][@"media"] firstObject][@"sizes"];
-				NSNumber * imageHeight = imageSizes[@"large"][@"w"], * imageWidth = imageSizes[@"large"][@"w"];
-				NSLog(@"Image has height %@", imageHeight);
-				
-				// use placeholder as a test for now
-				imageWidth = @1200;
-				imageHeight = @742;
+				NSNumber * imageHeight = imageSizes[@"large"][@"h"], * imageWidth = imageSizes[@"large"][@"w"];
+				NSLog(@"IMAGE SIZES: %@", imageSizes);
 				
 				CGFloat imageWidthFloat = [imageWidth floatValue], imageHeightFloat = [imageHeight floatValue];
 				
@@ -127,10 +125,16 @@ typedef enum : NSUInteger {
 			
 			TweetImageTableViewCell * imageCell = (TweetImageTableViewCell *)cell;
 			
-			// Load image
-			UIImage * tempImage = [UIImage imageNamed:@"image_placeholder"];
+			// Get the image metadata
+			NSNumber * imageID = [tweet[@"entities"][@"media"] firstObject][@"id"];
 			
-			imageCell.contentImageView.image = tempImage;
+			// Load image
+			UIImage * image = self.imageCache[imageID];
+			if (image == nil) {
+				[self.timeline getImageForImageID:imageID];
+			} else {
+				imageCell.contentImageView.image = image;
+			}
 		} else {
 			// We need a text cell
 			cell = [tableView dequeueReusableCellWithIdentifier:textCellReuse forIndexPath:indexPath];
@@ -151,11 +155,11 @@ typedef enum : NSUInteger {
 			textCell.retweetedLabel.text = [tweet[@"retweeted"] isEqual: @(YES)] ? @"R" : @"NR";
 			textCell.retweetCountLabel.text = [(NSNumber *)tweet[@"retweet_count"] stringValue];
 			
-			UIImage * userAvatarImage = [self.imageCache objectForKey: userID];
+			UIImage * userAvatarImage = [self.userProfileImageCache objectForKey: userID];
 			if(userAvatarImage == nil) {
 				[self.timeline getProfilePictureForUserID: tweet[@"user"][@"id"]];
 			} else {
-				textCell.userAvatarImageView.image = [self.imageCache objectForKey:userID];
+				textCell.userAvatarImageView.image = [self.userProfileImageCache objectForKey:userID];
 			}
 		}
 		
@@ -208,11 +212,21 @@ typedef enum : NSUInteger {
 - (void)timeline:(UserTimeline *)timeline didFinishDownloadingProfileImageData:(NSData *)imageData forUserID:(NSNumber *)userID {
     UIImage * image = [UIImage imageWithData:imageData];
     
-    [self.imageCache setObject:image forKey:userID];
+    [self.userProfileImageCache setObject:image forKey:userID];
     
     dispatch_async(dispatch_get_main_queue(), ^{ // Make sure it happens on the main thread
         [self.tableView reloadData];
     });
+}
+
+- (void)timeline:(UserTimeline *)timeline didFinishDownloadingImage:(NSData *)imageData forImageID:(NSNumber *)imageID {
+	UIImage * image = [UIImage imageWithData: imageData];
+	
+	[self.imageCache setObject:image forKey:imageID];
+	
+	dispatch_async(dispatch_get_main_queue(), ^{ // Make sure it happens on the main thread
+		[self.tableView reloadData];
+	});
 }
 
 #pragma mark - IBActions

@@ -50,12 +50,25 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
 @property (nonatomic, retain) NSMutableDictionary<NSNumber *, NSDictionary *> * mutableUserCache;
 
 /**
+ *  A cache of photo entity metadata
+ *
+ *	<key> -> The photo ID
+ *	<value> -> The photo metadata
+ */
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, NSDictionary *> * mutableImageEntityCache;
+
+/**
+ *  A cache of the NSData for the images that have been downloaded
+ */
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, NSData *> * mutableImageData;
+
+/**
  *  A cache of user image data given their user ID
  *
  *	<key> -> The user ID
  *	<value> -> The JSON image data for that user
  */
-@property (nonatomic, retain) NSMutableDictionary<NSNumber *, NSData *> * mutableImageData;
+@property (nonatomic, retain) NSMutableDictionary<NSNumber *, NSData *> * mutableUserProfileImageData;
 
 /**
  *  An NSURLSession used for downloading images and other things not downloaded via
@@ -70,6 +83,8 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
  *	<value> -> The user ID
  */
 @property (nonatomic, retain) NSMutableDictionary<NSNumber *, NSNumber *> * userIDForTask;
+
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, NSNumber *> * imageIDForTask;
 
 /**
  *  Sends a request to a Twitter URL with params as parameters and calls handler with the data when
@@ -111,9 +126,13 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
     self.minID = @0;
     
     self.mutableTweets = [[NSMutableArray alloc] init];
-    self.mutableImageData = [[NSMutableDictionary alloc] init];
-    self.mutableUserCache = [[NSMutableDictionary alloc] init];
+	self.mutableUserCache = [[NSMutableDictionary alloc] init];
+	self.mutableImageEntityCache = [NSMutableDictionary dictionary];
+	self.mutableImageData = [NSMutableDictionary dictionary];
+    self.mutableUserProfileImageData = [[NSMutableDictionary alloc] init];
+	
     self.userIDForTask = [[NSMutableDictionary alloc] init];
+	self.imageIDForTask = [NSMutableDictionary dictionary];
     _loggedIn = NO;
     
     NSURLSessionConfiguration * configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
@@ -244,6 +263,17 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
             if ([tweetID compare: requestMinID] == NSOrderedAscending || [requestMinID isEqualToNumber:@0]) {
                 requestMinID = tweetID;
             }
+			
+			// Add any entity metadata to caches
+			for (NSDictionary * entity in tweet[@"entities"][@"media"]) {
+				NSString * type = entity[@"type"];
+				if ([type isEqualToString:@"photo"]) {
+					NSNumber * imageID = entity[@"id"];
+					[self.mutableImageEntityCache setObject: entity forKey: imageID];
+				} else {
+					NSLog(@"There is a media entity I don't know how to handle of type: %@", type);
+				}
+			}
             
             [self.mutableTweets addObject:tweet];
         }
@@ -269,7 +299,7 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
 }
 
 - (void)getProfilePictureForUserID:(NSNumber *)userID {
-    NSData * imageData = [self.mutableImageData objectForKey:userID];
+    NSData * imageData = [self.mutableUserProfileImageData objectForKey:userID];
     if (imageData != nil) {
         // We have the data already, return it through the delegate
         NSLog(@"Requested cached profile image, returning without session request.");
@@ -280,7 +310,7 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
     // Check if we have the user data cached already
     NSDictionary * user = [self.mutableUserCache objectForKey:userID];
     if (user != nil) {
-        if ([self.mutableImageData objectForKey: user[@"id"]] == 0) {
+        if ([self.mutableUserProfileImageData objectForKey: user[@"id"]] == 0) {
             // We have the user but not the image; download the image now
             [self downloadProfileImageForUserID:userID withProfileImageURL: user[@"profile_image_url_https"]];
             return;
@@ -326,6 +356,45 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
     }
 }
 
+- (void)getImageForImageID:(NSNumber *)imageID {
+	NSData * imageData = [self.mutableImageData objectForKey:imageID];
+	if (imageData != nil) {
+		[self.delegate timeline:self didFinishDownloadingImage:imageData forImageID:imageID];
+		return;
+	}
+	
+	NSDictionary * imageMetadata = self.mutableImageEntityCache[imageID];
+	if (imageMetadata != nil) {
+		// We have the URL cached, we can just download it
+		NSString * url = imageMetadata[@"media_url_https"];
+		[self downloadImageForImageID:imageID withImageURL:url];
+		return;
+	}
+	
+	// In the rare occasion that the client wants to download an image that we have not cached
+	// the metadata for yet, we can manually download the image data and then download the
+	// image.
+	
+	// This code will break the world
+	NSLog(@"YOU BROKE ME");
+	id d = [NSMutableDictionary dictionary];
+	id a = [NSArray array];
+	[d isEqual:a];
+}
+
+- (void)downloadImageForImageID: (NSNumber *)imageID withImageURL: (NSString *)url {
+	// Make sure the item is not queued already
+	if (![self.imageIDForTask.allValues containsObject:imageID]) {
+		NSLog(@"Downloading image with ID: %@", imageID);
+		
+		NSURLSessionDownloadTask * task = [self.session downloadTaskWithURL:[NSURL URLWithString: url]];
+		[self.imageIDForTask setObject:imageID forKey:[NSNumber numberWithInteger: task.taskIdentifier]];
+		[task resume];
+	} else {
+		
+	}
+}
+
 - (NSArray *)tweets {
     return [self.mutableTweets copy];
 }
@@ -335,13 +404,25 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
 #pragma mark - NSURLSessionDownloadDelegate
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
-    NSData * data = [NSData dataWithContentsOfURL:location];
-    
-    NSNumber * taskIdentifier = [NSNumber numberWithUnsignedInteger:downloadTask.taskIdentifier];
-    NSNumber * userID = [self.userIDForTask objectForKey:taskIdentifier];
-    [self.userIDForTask removeObjectForKey:taskIdentifier];
-    
-    [self.delegate timeline:self didFinishDownloadingProfileImageData:data forUserID:userID];
+	NSData * data = [NSData dataWithContentsOfURL:location];
+	NSNumber * taskIdentifier = [NSNumber numberWithInteger:downloadTask.taskIdentifier];
+	
+	if ([self.imageIDForTask.allKeys containsObject: taskIdentifier]) {
+		// It's an image
+		NSNumber * imageID = [self.imageIDForTask objectForKey:taskIdentifier];
+		[self.imageIDForTask removeObjectForKey:taskIdentifier];
+		
+		[self.delegate timeline:self didFinishDownloadingImage:data forImageID: imageID];
+		return;
+	} else if ([self.userIDForTask.allKeys containsObject:taskIdentifier]) {
+		// It's a profile image
+		NSNumber * userID = [self.userIDForTask objectForKey:taskIdentifier];
+		[self.userIDForTask removeObjectForKey:taskIdentifier];
+		
+		[self.delegate timeline:self didFinishDownloadingProfileImageData:data forUserID:userID];
+		return;
+	}
+	NSLog(@"I have downloaded data and I don't know what to do with it!");
 }
 
 @end

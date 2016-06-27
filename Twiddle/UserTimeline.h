@@ -73,6 +73,14 @@
  */
 - (void)getProfilePictureForUserID: (NSNumber *)userID;
 
+/**
+ *  Gets an image given the imageID. Returns any data to the delegate with
+ *	didFinishDownloadingImageData
+ *
+ *  @param imageID the ID of the image to be found
+ */
+- (void)getImageForImageID: (NSNumber *)imageID;
+
 @end
 
 
@@ -122,5 +130,7 @@
  *  @param userID    The userID for which the imageData corresponds to
  */
 - (void)timeline:(UserTimeline *) timeline didFinishDownloadingProfileImageData: (NSData *)imageData forUserID: (NSNumber *)userID;
+
+- (void)timeline:(UserTimeline *)timeline didFinishDownloadingImage: (NSData *)imageData forImageID: (NSNumber *)imageID;
 
 @end
