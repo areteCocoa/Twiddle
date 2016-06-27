@@ -134,8 +134,16 @@ typedef enum : NSUInteger {
     [self.tableView reloadData];
 }
 
-- (void)timeline:(UserTimeline *)timeline didUpdateTimeline:(NSArray *)newTweets {
+- (void)timeline:(UserTimeline *)timeline didGetMoreTimeline:(NSArray *)newTweets {
     [self.tableView reloadData];
+}
+
+- (void)timeline:(UserTimeline *)timeline didRefreshTimeline:(NSArray *)newTweets {
+    [self.refreshControl endRefreshing];
+    
+    if (newTweets.count != 0) {
+        [self.tableView reloadData];
+    }
 }
 
 - (void)timeline:(UserTimeline *)timeline didFinishDownloadingProfileImageData:(NSData *)imageData forUserID:(NSNumber *)userID {
@@ -151,8 +159,7 @@ typedef enum : NSUInteger {
 #pragma mark - IBActions
 
 - (IBAction)refresh: (UIRefreshControl *)sender {
-    NSLog(@"Refreshing");
-    [sender endRefreshing];
+    [self.timeline refreshTimeline];
 }
 
 /*
