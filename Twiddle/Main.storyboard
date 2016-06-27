@@ -123,16 +123,30 @@
                                     <outlet property="usernameLabel" destination="X8S-Iu-moI" id="9Up-94-XVW"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="image_cell" id="ehr-4J-3aN">
-                                <rect key="frame" x="0.0" y="208" width="600" height="44"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="image_cell" rowHeight="221" id="ehr-4J-3aN" customClass="TweetImageTableViewCell">
+                                <rect key="frame" x="0.0" y="208" width="600" height="221"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ehr-4J-3aN" id="IE8-zK-b0q">
-                                    <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="600" height="221"/>
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="image_placeholder" translatesAutoresizingMaskIntoConstraints="NO" id="I5k-TO-gpY">
+                                            <rect key="frame" x="0.0" y="0.0" width="600" height="221"/>
+                                        </imageView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="I5k-TO-gpY" firstAttribute="centerY" secondItem="IE8-zK-b0q" secondAttribute="centerY" id="8V0-8c-i8j"/>
+                                        <constraint firstItem="I5k-TO-gpY" firstAttribute="centerX" secondItem="IE8-zK-b0q" secondAttribute="centerX" id="e6a-es-0N3"/>
+                                        <constraint firstItem="I5k-TO-gpY" firstAttribute="width" secondItem="IE8-zK-b0q" secondAttribute="width" id="utU-m6-EAF"/>
+                                        <constraint firstItem="I5k-TO-gpY" firstAttribute="height" secondItem="IE8-zK-b0q" secondAttribute="height" id="xbo-VX-P71"/>
+                                    </constraints>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="contentImageView" destination="I5k-TO-gpY" id="l9U-LZ-bkR"/>
+                                </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="load_more_cell" textLabel="EUt-JC-QZl" style="IBUITableViewCellStyleDefault" id="HUH-hj-XWh">
-                                <rect key="frame" x="0.0" y="252" width="600" height="44"/>
+                                <rect key="frame" x="0.0" y="429" width="600" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="HUH-hj-XWh" id="2TC-Yf-76X">
                                     <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
@@ -184,4 +198,7 @@
             <point key="canvasLocation" x="906" y="-24"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="image_placeholder" width="1200" height="742"/>
+    </resources>
 </document>

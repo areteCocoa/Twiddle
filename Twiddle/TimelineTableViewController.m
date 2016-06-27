@@ -10,13 +10,14 @@
 
 #import "UserTimeline.h"
 #import "TweetTextTableViewCell.h"
+#import "TweetImageTableViewCell.h"
 
 static NSString * textCellReuse = @"text_cell";
 static NSString * imageCellReuse = @"image_cell";
 static NSString * loadMoreReuse = @"load_more_cell";
 
 static CGFloat textCellHeight = 120;
-// static CGFloat imageCellHeight = 150;
+static CGFloat imageCellHeight = 150;
 static CGFloat loadMoreCellHeight = 40;
 
 typedef enum : NSUInteger {
@@ -76,6 +77,34 @@ typedef enum : NSUInteger {
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == TweetsSection) {
+		if (self.timeline.tweets.count == 0 || self.timeline.tweets.count < indexPath.row) {
+			// We don't have data for this cell yet, return placeholder height
+			return textCellHeight;
+		} else {
+			// We actually have data, time to figure out it's type and height
+			NSDictionary * tweet = self.timeline.tweets[indexPath.row];
+			if ([[tweet[@"entities"][@"media"] firstObject][@"type"] isEqualToString:@"photo"]) {
+				// It is an image and we need to calculate the height given the screen width
+				NSDictionary * imageSizes = [tweet[@"entities"][@"media"] firstObject][@"sizes"];
+				NSNumber * imageHeight = imageSizes[@"large"][@"w"], * imageWidth = imageSizes[@"large"][@"w"];
+				NSLog(@"Image has height %@", imageHeight);
+				
+				// use placeholder as a test for now
+				imageWidth = @1200;
+				imageHeight = @742;
+				
+				CGFloat imageWidthFloat = [imageWidth floatValue], imageHeightFloat = [imageHeight floatValue];
+				
+				CGFloat cellWidth = self.tableView.frame.size.width;
+				CGFloat cellHeight = (cellWidth * imageHeightFloat) / imageWidthFloat;
+				
+				return cellHeight;
+			} else {
+				// It is a text cell and we can return the placeholder for now
+				return textCellHeight;
+			}
+		}
+		
         return textCellHeight;
     } else if (indexPath.section == LoadMoreSection) {
         return loadMoreCellHeight;
@@ -85,36 +114,57 @@ typedef enum : NSUInteger {
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == TweetsSection) {
-        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:textCellReuse forIndexPath:indexPath];
-        
-        // Configure the cell...
-        NSDictionary * tweet = self.timeline.tweets[indexPath.row];
-        NSNumber * userID = tweet[@"user"][@"id"];
-        
-        TweetTextTableViewCell * textCell = (TweetTextTableViewCell *)cell;
-        
-        // Setup properties
-        textCell.usernameLabel.text = tweet[@"user"][@"name"];
-        textCell.tweetTextView.text = tweet[@"text"];
+		UITableViewCell * cell;
 		
-		textCell.createdDateLabel.text = tweet[@"created_at"];
+		// Fetch the data first
+		NSDictionary * tweet = self.timeline.tweets[indexPath.row];
+		NSNumber * userID = tweet[@"user"][@"id"];
 		
-		textCell.favoritedLabel.text = [tweet[@"favorited"]  isEqual: @(YES)] ? @"F" : @"NF";
-		textCell.favoritesCountLabel.text = [(NSNumber *)tweet[@"favorite_count"] stringValue];
-		textCell.retweetedLabel.text = [tweet[@"retweeted"] isEqual: @(YES)] ? @"R" : @"NR";
-		textCell.retweetCountLabel.text = [(NSNumber *)tweet[@"retweet_count"] stringValue];
-        
-        UIImage * userAvatarImage = [self.imageCache objectForKey: userID];
-        if(userAvatarImage == nil) {
-            [self.timeline getProfilePictureForUserID: tweet[@"user"][@"id"]];
-        } else {
-            textCell.userAvatarImageView.image = [self.imageCache objectForKey:userID];
-        }
-        
+		// Figure out what kind of tweet we have -- text or image or link
+		if ([[tweet[@"entities"][@"media"] firstObject][@"type"] isEqualToString:@"photo"]) {
+			// We need an image cell
+			cell = [tableView dequeueReusableCellWithIdentifier:imageCellReuse forIndexPath:indexPath];
+			
+			TweetImageTableViewCell * imageCell = (TweetImageTableViewCell *)cell;
+			
+			// Load image
+			UIImage * tempImage = [UIImage imageNamed:@"image_placeholder"];
+			
+			imageCell.contentImageView.image = tempImage;
+		} else {
+			// We need a text cell
+			cell = [tableView dequeueReusableCellWithIdentifier:textCellReuse forIndexPath:indexPath];
+			
+			// Configure the cell...
+			
+			
+			TweetTextTableViewCell * textCell = (TweetTextTableViewCell *)cell;
+			
+			// Setup properties
+			textCell.usernameLabel.text = tweet[@"user"][@"name"];
+			textCell.tweetTextView.text = tweet[@"text"];
+			
+			textCell.createdDateLabel.text = tweet[@"created_at"];
+			
+			textCell.favoritedLabel.text = [tweet[@"favorited"]  isEqual: @(YES)] ? @"F" : @"NF";
+			textCell.favoritesCountLabel.text = [(NSNumber *)tweet[@"favorite_count"] stringValue];
+			textCell.retweetedLabel.text = [tweet[@"retweeted"] isEqual: @(YES)] ? @"R" : @"NR";
+			textCell.retweetCountLabel.text = [(NSNumber *)tweet[@"retweet_count"] stringValue];
+			
+			UIImage * userAvatarImage = [self.imageCache objectForKey: userID];
+			if(userAvatarImage == nil) {
+				[self.timeline getProfilePictureForUserID: tweet[@"user"][@"id"]];
+			} else {
+				textCell.userAvatarImageView.image = [self.imageCache objectForKey:userID];
+			}
+		}
+		
+		
+		
         if (indexPath.row % 2 == 1) {
-            textCell.backgroundColor = [UIColor colorWithWhite:0.97 alpha:1.0];
+            cell.backgroundColor = [UIColor colorWithWhite:0.97 alpha:1.0];
         } else {
-            textCell.backgroundColor = [UIColor colorWithWhite:1.0 alpha:1.0];
+            cell.backgroundColor = [UIColor colorWithWhite:1.0 alpha:1.0];
         }
         
         return cell;

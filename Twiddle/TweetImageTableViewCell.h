@@ -10,4 +10,10 @@
 
 @interface TweetImageTableViewCell : UITableViewCell
 
+@property (nonatomic, strong) IBOutlet UIImageView * contentImageView;
+
+@property (nonatomic, strong) IBOutlet UILabel * createdAtLabel;
+
+@property (nonatomic, strong) IBOutlet UILabel * nameLabel;
+
 @end
