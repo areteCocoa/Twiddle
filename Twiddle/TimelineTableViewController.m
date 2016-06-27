@@ -96,6 +96,13 @@ typedef enum : NSUInteger {
         // Setup properties
         textCell.usernameLabel.text = tweet[@"user"][@"name"];
         textCell.tweetTextView.text = tweet[@"text"];
+		
+		textCell.createdDateLabel.text = tweet[@"created_at"];
+		
+		textCell.favoritedLabel.text = [tweet[@"favorited"]  isEqual: @(YES)] ? @"F" : @"NF";
+		textCell.favoritesCountLabel.text = [(NSNumber *)tweet[@"favorite_count"] stringValue];
+		textCell.retweetedLabel.text = [tweet[@"retweeted"] isEqual: @(YES)] ? @"R" : @"NR";
+		textCell.retweetCountLabel.text = [(NSNumber *)tweet[@"retweet_count"] stringValue];
         
         UIImage * userAvatarImage = [self.imageCache objectForKey: userID];
         if(userAvatarImage == nil) {
