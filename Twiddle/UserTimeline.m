@@ -125,11 +125,11 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
 - (void)login {
     [[Twitter sharedInstance] logInWithCompletion:^(TWTRSession *session, NSError *error) {
         if (session) {
-            NSLog(@"signed in as %@", [session userName]);
+            NSLog(@"Successfully signed in as %@.", [session userName]);
             _loggedIn = YES;
             [self.delegate timeline:self didLoginWithError:nil];
         } else {
-            NSLog(@"error: %@", [error localizedDescription]);
+            NSLog(@"Attempted to log in but there was an error: %@", [error localizedDescription]);
             _loggedIn = NO;
             [self.delegate timeline:self didLoginWithError:error];
         }
@@ -155,7 +155,7 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
                 handler(data);
             }
             else {
-                NSLog(@"Get request to twitte at endpoint %@ failed due to error: %@", url, connectionError.localizedDescription);
+                NSLog(@"GET request to Twitter at endpoint %@ failed due to error: %@", url, connectionError.localizedDescription);
             }
         }];
     }
@@ -223,6 +223,10 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
     [self sendGetRequestToTwitterURL:url withParams:params withHandler:^(NSData *data) {
         NSError *jsonError;
         NSArray *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+		
+		if (jsonError != nil) {
+			NSLog(@"There was an error parsing returned JSON data from Twitter: %@", jsonError.localizedDescription);
+		}
         
         NSNumber * requestMaxID = @0, * requestMinID = @0;
         
@@ -293,8 +297,11 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
         NSLog(@"User data request returned successfully!");
         
         NSError *jsonError;
-        
         NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+		
+		if (jsonError != nil) {
+			NSLog(@"There was an error in parsing returned JSON data: %@", jsonError.localizedDescription);
+		}
         
         // Add the user to cache
         NSNumber * returnedUserID = json[@"id"];

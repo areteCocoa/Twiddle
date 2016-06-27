@@ -134,7 +134,9 @@ typedef enum : NSUInteger {
 - (void)timeline:(UserTimeline *)timeline didLoginWithError:(NSError *)error {
     if (!error) {
         [timeline getInitalTimeline];
-    }
+	} else {
+		NSLog(@"TimelineTableViewController attempted to login user but there was an error: %@", error.localizedDescription);
+	}
 }
 
 - (void)timeline:(UserTimeline *)timeline didGetInitalTimeline:(NSArray *)tweets {
