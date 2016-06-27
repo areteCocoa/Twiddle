@@ -24,6 +24,8 @@
 
 - (void)getMoreTimeline;
 
+- (void)refreshTimeline;
+
 - (void)getProfilePictureForUserID: (NSNumber *)userID;
 
 @end
@@ -36,7 +38,9 @@
 
 - (void)timeline:(UserTimeline *) timeline didGetInitalTimeline: (NSArray *)tweets;
 
-- (void)timeline: (UserTimeline *) timeline didUpdateTimeline: (NSArray*)newTweets;
+- (void)timeline: (UserTimeline *) timeline didGetMoreTimeline: (NSArray*)newTweets;
+
+- (void)timeline: (UserTimeline *) timeline didRefreshTimeline: (NSArray *)newTweets;
 
 - (void)timeline:(UserTimeline *) timeline didFinishDownloadingProfileImageData: (NSData *)imageData forUserID: (NSNumber *)userID;
 

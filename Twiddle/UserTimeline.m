@@ -10,6 +10,8 @@
 
 #import <TwitterKit/TwitterKit.h>
 
+typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNumber * maxID);
+
 @interface UserTimeline() <NSURLSessionDelegate, NSURLSessionDownloadDelegate>
 
 @property (nonatomic) NSNumber * minID;
@@ -93,7 +95,7 @@
 }
 
 - (void)getInitalTimeline {
-    [self getTimelineWithCount:-1 withMaxID:-1 sinceID:-1 withCompletion:^(NSArray *newData) {
+    [self getTimelineWithCount:-1 withMaxID:-1 sinceID:-1 withCompletion:^(NSArray *newData, NSNumber *minID, NSNumber *maxID) {
         if (self.delegate) {
             [self.delegate timeline:self didGetInitalTimeline:self.tweets];
         }
@@ -102,9 +104,23 @@
 
 - (void)getMoreTimeline {
     NSInteger maxID = [self.minID integerValue] - 1;
-    [self getTimelineWithCount:20 withMaxID:maxID sinceID:-1 withCompletion:^(NSArray *newData) {
+    [self getTimelineWithCount:20 withMaxID:maxID sinceID:-1 withCompletion:^(NSArray *newData, NSNumber* minID, NSNumber * maxID) {
         if (self.delegate) {
-            [self.delegate timeline:self didUpdateTimeline:newData];
+            [self.delegate timeline:self didGetMoreTimeline:newData];
+        }
+    }];
+}
+
+- (void)refreshTimeline {
+    NSInteger sinceID = [self.maxID integerValue];
+    [self getTimelineWithCount:20 withMaxID:-1 sinceID:sinceID withCompletion:^(NSArray *newData, NSNumber * minID, NSNumber * maxID) {
+        if (newData.count == 0) {
+            NSLog(@"ALL UPDATED!");
+        } else {
+            NSLog(@"We have more data.");
+        }
+        if (self.delegate) {
+            [self.delegate timeline:self didRefreshTimeline:newData];
         }
     }];
 }
@@ -112,7 +128,7 @@
 // int 64 - count: the number of tweets, must be <= 200
 // int 64 - max_id: The maximum ID for the tweet to be loaded INCLUSIVE (use max_id - 1)
 // int 64 - since_id: The minimum ID for the tweets to be loaded EXCLUSIVE
-- (void)getTimelineWithCount: (NSInteger)count withMaxID: (NSInteger)maxID sinceID: (NSInteger)sinceID withCompletion:(void(^)(NSArray * newData)) completion {
+- (void)getTimelineWithCount: (NSInteger)count withMaxID: (NSInteger)maxID sinceID: (NSInteger)sinceID withCompletion:(TweetHandlerCompletion) completion {
     // Validate all parameters - because we take -1 as no specifier we must be careful what we add to the parameters
     NSMutableDictionary * params = [NSMutableDictionary dictionary];
     
@@ -136,32 +152,42 @@
         NSError *jsonError;
         NSArray *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
         
+        NSNumber * requestMaxID = @0, * requestMinID = @0;
+        
         for (NSDictionary * tweet in json) {
             // Cache the user data so we don't have to waste a request on it
             NSDictionary * user = tweet[@"user"];
             NSNumber * userID = user[@"id"];
             [self.mutableUserCache setObject:user forKey:userID];
             
-            // See if we have the lowest or highest tweet
+            // See if we have the lowest or highest tweet in this request
             NSNumber * tweetID = tweet[@"id"];
-            if (self.mutableTweets.count != 0) {
-                if ([tweetID compare:self.maxID] == NSOrderedDescending) {
-                    self.maxID = tweetID;
-                }
-                if ([tweetID compare:self.minID] == NSOrderedAscending) {
-                    self.minID = tweetID;
-                }
-            } else {
-                self.maxID = tweetID;
-                self.minID = tweetID;
+            if ([tweetID compare: requestMaxID] == NSOrderedDescending || [requestMaxID isEqualToNumber:@0]) {
+                requestMaxID = tweetID;
             }
-            
+            if ([tweetID compare: requestMinID] == NSOrderedAscending || [requestMinID isEqualToNumber:@0]) {
+                requestMinID = tweetID;
+            }
             
             [self.mutableTweets addObject:tweet];
         }
+        
+        // Set this timeline's max and min
+        if (self.mutableTweets.count != 0) {
+            if ([requestMaxID compare:self.maxID] == NSOrderedDescending) {
+                self.maxID = requestMaxID;
+            }
+            if ([requestMinID compare:self.minID] == NSOrderedAscending) {
+                self.minID = requestMinID;
+            }
+        } else {
+            self.maxID = requestMaxID;
+            self.minID = requestMinID;
+        }
+        
 
         if (completion != nil) {
-            completion(json);
+            completion(json, requestMaxID, requestMinID);
         }
     }];
 }
