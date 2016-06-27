@@ -10,23 +10,95 @@
 
 #import <TwitterKit/TwitterKit.h>
 
+/**
+ *  A handler for when any tweets are returned from a request to twitter.
+ *
+ *	It does not return ALL data because it is already stored by the time it is being
+ *	passed as newData.
+ *
+ *  @param newData The new data returned from the request
+ *  @param minID   The smallest tweet id of the request
+ *  @param maxID   The largest tweet id of the request
+ */
 typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNumber * maxID);
+
+
 
 @interface UserTimeline() <NSURLSessionDelegate, NSURLSessionDownloadDelegate>
 
+/**
+ *  The smallest tweet ID this timeline currently has
+ */
 @property (nonatomic) NSNumber * minID;
 
+/**
+ *  The largest tweet ID this timeline currently has
+ */
 @property (nonatomic) NSNumber * maxID;
 
-@property (nonatomic, retain) NSMutableDictionary<NSNumber *, NSDictionary *> * mutableUserCache;
-
+/**
+ *  The internal array of tweets in this timeline
+ */
 @property (nonatomic, retain) NSMutableArray * mutableTweets;
 
+/**
+ *  A cache of user data given their user ID
+ *
+ *	<key> -> The user ID
+ *	<value> -> The JSON user data
+ */
+@property (nonatomic, retain) NSMutableDictionary<NSNumber *, NSDictionary *> * mutableUserCache;
+
+/**
+ *  A cache of user image data given their user ID
+ *
+ *	<key> -> The user ID
+ *	<value> -> The JSON image data for that user
+ */
 @property (nonatomic, retain) NSMutableDictionary<NSNumber *, NSData *> * mutableImageData;
 
+/**
+ *  An NSURLSession used for downloading images and other things not downloaded via
+ *	the Twitter API
+ */
 @property (nonatomic, retain) NSURLSession * session;
 
+/**
+ *  A dictionary tracking the user ID for download tasks for when downloading profile image data
+ *
+ *	<key> -> The task identifier
+ *	<value> -> The user ID
+ */
 @property (nonatomic, retain) NSMutableDictionary<NSNumber *, NSNumber *> * userIDForTask;
+
+/**
+ *  Sends a request to a Twitter URL with params as parameters and calls handler with the data when
+ *  it is done
+ *
+ *  @param url     The URL to be called
+ *  @param params  Parameters for the API call
+ *  @param handler A handler for if the data is valid
+ */
+- (void)sendGetRequestToTwitterURL: (NSString *)url withParams: (NSDictionary *)params withHandler: (void (^)(NSData * data))handler;
+
+/**
+ *  Fetches the user timeline for count number of tweets with maxID and sinceID as parameters. Calls completion
+ *	when it is done processing the data
+ *
+ *  @param count      The number of tweets to be fetched
+ *  @param maxID      The maximum tweet ID allowed; inclusive
+ *  @param sinceID    The minimum tweet ID allowed; exclusive
+ *  @param completion The completion handler for when the fetch is complete and the data is handled
+ */
+- (void)getTimelineWithCount: (NSInteger)count withMaxID: (NSInteger)maxID sinceID: (NSInteger)sinceID withCompletion:(TweetHandlerCompletion) completion;
+
+/**
+ *  Download the user with userID's profile image data and returns it to the handler
+ *
+ *  @param userID          the user's userID
+ *  @param profileImageURL the URL of the profile image
+ */
+- (void)downloadProfileImageForUserID: (NSNumber *)userID withProfileImageURL: (NSString *)profileImageURL;
 
 @end
 
