@@ -135,14 +135,15 @@ typedef enum : NSUInteger {
 		
 		// Fetch the data first
 		NSDictionary * tweet = self.timeline.tweets[indexPath.row];
-		NSNumber * userID = tweet[@"user"][@"id"];
 		
 		// Figure out what kind of tweet we have -- text or image or link
 		if ([[tweet[@"entities"][@"media"] firstObject][@"type"] isEqualToString:@"photo"]) {
 			// We need an image cell
 			cell = [tableView dequeueReusableCellWithIdentifier:imageCellReuse forIndexPath:indexPath];
 			
+			// Setup text info
 			TweetImageTableViewCell * imageCell = (TweetImageTableViewCell *)cell;
+			[self loadTextCell:imageCell withTweet:tweet];
 			
 			// Get the image metadata
 			NSNumber * imageID = [tweet[@"entities"][@"media"] firstObject][@"id"];
@@ -161,73 +162,7 @@ typedef enum : NSUInteger {
 			// Configure the cell...
 			TweetTextTableViewCell * textCell = (TweetTextTableViewCell *)cell;
 			
-			// Setup properties
-			textCell.handleLabel.text = tweet[@"user"][@"name"];
-			textCell.screenNameLabel.text = [NSString stringWithFormat:@"@%@", tweet[@"user"][@"screen_name"]];
-			
-			// Set inset
-			textCell.tweetTextLabel.text = tweet[@"text"];
-			if (self.textViewWidth == 0) {
-				self.textViewWidth = textCell.tweetTextLabel.frame.size.width;
-			}
-			
-			// How long ago was it posted?
-			// Wed Jun 29 6:52:07 +0000 2016
-			NSString * timeSinceString = @"";
-			NSString * dateString = tweet[@"created_at"];
-			NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
-			formatter.dateFormat = @"EEE MMM dd HH:mm:ss ZZZ yyyy";
-			NSDate * date = [formatter dateFromString: dateString];
-			NSTimeInterval interval = 0 - [date timeIntervalSinceNow];
-			int seconds = floor(interval);
-			int minutes = floor(seconds / 60);
-			int hours = floor(minutes / 60);
-			int days = floor(hours / 24);
-			int weeks = floor(days / 7);
-			int months = floor(weeks / 52);
-			int years = floor(months / 12);
-			if (years > 0) {
-				timeSinceString = [NSString stringWithFormat:@"%d years ago", years];
-			} else if (months > 0) {
-				timeSinceString = [NSString stringWithFormat:@"%d months ago", months];
-			} else if (days > 0) {
-				timeSinceString = [NSString stringWithFormat:@"%d days ago", days];
-			} else if (hours > 0) {
-				timeSinceString = [NSString stringWithFormat:@"%d hours ago", hours];
-			} else if (minutes > 0) {
-				timeSinceString = [NSString stringWithFormat:@"%d minutes ago", minutes];
-			} else if (seconds > 0) {
-				timeSinceString = [NSString stringWithFormat:@"%d seconds ago", seconds];
-			} else {
-				timeSinceString = @"now";
-			}
-			textCell.createdDateLabel.text = timeSinceString;
-			
-			
-			textCell.favoritesCountLabel.text = [NSString stringWithFormat:@"%@ favorites", (NSNumber *)tweet[@"favorite_count"]];
-			if ([tweet[@"favorited"]  isEqual: @(YES)]) {
-				textCell.favoritesCountLabel.font = [UIFont boldSystemFontOfSize:12.0];
-			} else {
-				textCell.favoritesCountLabel.font = [UIFont systemFontOfSize:12.0];
-			}
-			
-			textCell.retweetCountLabel.text = [NSString stringWithFormat:@"%@ retweets", (NSNumber *)tweet[@"retweet_count"]];
-			if ([tweet[@"retweeted"] isEqual: @(YES)]) {
-				textCell.retweetCountLabel.font = [UIFont boldSystemFontOfSize:12.0];
-			} else {
-				textCell.retweetCountLabel.font = [UIFont systemFontOfSize:12.0];
-			}
-			
-			UIImage * userAvatarImage = [self.userProfileImageCache objectForKey: userID];
-			if(userAvatarImage == nil) {
-				[self.timeline getProfilePictureForUserID: tweet[@"user"][@"id"]];
-			} else {
-				UIImageView * imageView = textCell.userAvatarImageView;
-				
-				imageView.image = userAvatarImage;
-				imageView.layer.cornerRadius = imageView.frame.size.width / 2;
-				imageView.layer.masksToBounds = YES;
-			}
+			[self loadTextCell:textCell withTweet:tweet];
 		}
 		
 		
@@ -248,6 +183,77 @@ typedef enum : NSUInteger {
     }
     
     return nil;
+}
+
+- (void)loadTextCell: (TweetTextTableViewCell *)cell withTweet: (NSDictionary *)tweet {
+	NSNumber * userID = tweet[@"user"][@"id"];
+	
+	// Setup properties
+	cell.handleLabel.text = tweet[@"user"][@"name"];
+	cell.screenNameLabel.text = [NSString stringWithFormat:@"@%@", tweet[@"user"][@"screen_name"]];
+	
+	// Set inset
+	cell.tweetTextLabel.text = tweet[@"text"];
+	if (self.textViewWidth == 0) {
+		self.textViewWidth = cell.tweetTextLabel.frame.size.width;
+	}
+	
+	// How long ago was it posted?
+	// Wed Jun 29 6:52:07 +0000 2016
+	NSString * timeSinceString = @"";
+	NSString * dateString = tweet[@"created_at"];
+	NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
+	formatter.dateFormat = @"EEE MMM dd HH:mm:ss ZZZ yyyy";
+	NSDate * date = [formatter dateFromString: dateString];
+	NSTimeInterval interval = 0 - [date timeIntervalSinceNow];
+	int seconds = floor(interval);
+	int minutes = floor(seconds / 60);
+	int hours = floor(minutes / 60);
+	int days = floor(hours / 24);
+	int weeks = floor(days / 7);
+	int months = floor(weeks / 52);
+	int years = floor(months / 12);
+	if (years > 0) {
+		timeSinceString = [NSString stringWithFormat:@"%d years ago", years];
+	} else if (months > 0) {
+		timeSinceString = [NSString stringWithFormat:@"%d months ago", months];
+	} else if (days > 0) {
+		timeSinceString = [NSString stringWithFormat:@"%d days ago", days];
+	} else if (hours > 0) {
+		timeSinceString = [NSString stringWithFormat:@"%d hours ago", hours];
+	} else if (minutes > 0) {
+		timeSinceString = [NSString stringWithFormat:@"%d minutes ago", minutes];
+	} else if (seconds > 0) {
+		timeSinceString = [NSString stringWithFormat:@"%d seconds ago", seconds];
+	} else {
+		timeSinceString = @"now";
+	}
+	cell.createdDateLabel.text = timeSinceString;
+	
+	cell.favoritesCountLabel.text = [NSString stringWithFormat:@"%@ favorites", (NSNumber *)tweet[@"favorite_count"]];
+	if ([tweet[@"favorited"]  isEqual: @(YES)]) {
+		cell.favoritesCountLabel.font = [UIFont boldSystemFontOfSize:12.0];
+	} else {
+		cell.favoritesCountLabel.font = [UIFont systemFontOfSize:12.0];
+	}
+	
+	cell.retweetCountLabel.text = [NSString stringWithFormat:@"%@ retweets", (NSNumber *)tweet[@"retweet_count"]];
+	if ([tweet[@"retweeted"] isEqual: @(YES)]) {
+		cell.retweetCountLabel.font = [UIFont boldSystemFontOfSize:12.0];
+	} else {
+		cell.retweetCountLabel.font = [UIFont systemFontOfSize:12.0];
+	}
+	
+	UIImage * userAvatarImage = [self.userProfileImageCache objectForKey: userID];
+	if(userAvatarImage == nil) {
+		[self.timeline getProfilePictureForUserID: tweet[@"user"][@"id"]];
+	} else {
+		UIImageView * imageView = cell.userAvatarImageView;
+		
+		imageView.image = userAvatarImage;
+		imageView.layer.cornerRadius = imageView.frame.size.width / 2;
+		imageView.layer.masksToBounds = YES;
+	}
 }
 
 #pragma mark - UserTimelineDelegate

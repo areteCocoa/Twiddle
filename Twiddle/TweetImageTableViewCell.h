@@ -8,12 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TweetImageTableViewCell : UITableViewCell
+#import "TweetTextTableViewCell.h"
+
+@interface TweetImageTableViewCell : TweetTextTableViewCell
 
 @property (nonatomic, strong) IBOutlet UIImageView * contentImageView;
-
-@property (nonatomic, strong) IBOutlet UILabel * createdAtLabel;
-
-@property (nonatomic, strong) IBOutlet UILabel * nameLabel;
 
 @end
