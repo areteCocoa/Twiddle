@@ -13,7 +13,7 @@
 @property (strong, nonatomic) IBOutlet UILabel *handleLabel;
 @property (nonatomic, strong) IBOutlet UILabel *screenNameLabel;;
 @property (strong, nonatomic) IBOutlet UIImageView *userAvatarImageView;
-@property (strong, nonatomic) IBOutlet UITextView *tweetTextView;
+@property (strong, nonatomic) IBOutlet UILabel * tweetTextLabel;
 
 @property (nonatomic, strong) IBOutlet UILabel * createdDateLabel;
 @property (nonatomic, strong) IBOutlet UILabel * retweetCountLabel;

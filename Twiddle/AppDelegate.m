@@ -24,6 +24,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+	[[UINavigationBar appearance] setBackgroundColor:[UIColor whiteColor]];
+	[[UINavigationBar appearance] setOpaque: NO];
+	
     [[Twitter sharedInstance] startWithConsumerKey:@"fbmle15DlXrs3MHuh8vk48laC" consumerSecret:@"YH8VJcDuq57Wv3J3oVUMy7ojHCK3VPQwIMPSpGp0oQv1mwklS5"];
     
     [Fabric with:@[[Crashlytics class], [Twitter class], [MoPub class]]];

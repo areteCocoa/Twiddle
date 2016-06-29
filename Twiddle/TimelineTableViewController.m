@@ -57,13 +57,6 @@ typedef enum : NSUInteger {
     // Dispose of any resources that can be recreated.
 }
 
--(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-	UITextView *tv = object;
-	CGFloat topCorrect = ([tv bounds].size.height - [tv contentSize].height * [tv zoomScale])/2.0;
-	topCorrect = ( topCorrect < 0.0 ? 0.0 : topCorrect );
-	tv.contentOffset = (CGPoint){.x = 0, .y = -topCorrect};
-}
-
 - (void)loadMoreTweets {
     [self.timeline getMoreTimeline];
 }
@@ -173,12 +166,10 @@ typedef enum : NSUInteger {
 			textCell.screenNameLabel.text = [NSString stringWithFormat:@"@%@", tweet[@"user"][@"screen_name"]];
 			
 			// Set inset
-			textCell.tweetTextView.text = tweet[@"text"];
+			textCell.tweetTextLabel.text = tweet[@"text"];
 			if (self.textViewWidth == 0) {
-				self.textViewWidth = textCell.tweetTextView.frame.size.width;
+				self.textViewWidth = textCell.tweetTextLabel.frame.size.width;
 			}
-			[textCell.tweetTextView addObserver:self forKeyPath:@"contentSize" options:(NSKeyValueObservingOptionNew) context:NULL];
-			[textCell.tweetTextView setContentInset:UIEdgeInsetsMake(0, 0, 0, 0)];
 			
 			// How long ago was it posted?
 			// Wed Jun 29 6:52:07 +0000 2016

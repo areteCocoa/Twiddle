@@ -209,6 +209,8 @@
 				TargetAttributes = {
 					541F6D6D1D1706BB00740086 = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = V8CJ4XKCBY;
+						DevelopmentTeamName = "Thomas Ring (Personal Team)";
 					};
 					541F6D891D1706BB00740086 = {
 						CreatedOnToolsVersion = 7.3.1;
