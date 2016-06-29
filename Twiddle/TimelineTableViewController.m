@@ -170,7 +170,7 @@ typedef enum : NSUInteger {
 			
 			// Setup properties
 			textCell.handleLabel.text = tweet[@"user"][@"name"];
-			textCell.screenNameLabel.text = tweet[@"user"][@"screen_name"];
+			textCell.screenNameLabel.text = [NSString stringWithFormat:@"@%@", tweet[@"user"][@"screen_name"]];
 			
 			// Set inset
 			textCell.tweetTextView.text = tweet[@"text"];
