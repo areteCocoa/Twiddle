@@ -396,6 +396,10 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
 }
 
 - (NSArray *)tweets {
+	if (!self.mutableTweets) {
+		NSLog(@"TRIED TO GET TWEETS BEFORE IT WAS EVEN INSTANTIATED!");
+	}
+	
     return [self.mutableTweets copy];
 }
 

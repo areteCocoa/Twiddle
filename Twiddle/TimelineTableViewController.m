@@ -16,7 +16,7 @@ static NSString * textCellReuse = @"text_cell";
 static NSString * imageCellReuse = @"image_cell";
 static NSString * loadMoreReuse = @"load_more_cell";
 
-static CGFloat textCellHeight = 120;
+static CGFloat textCellHeight = 90;
 static CGFloat loadMoreCellHeight = 40;
 
 typedef enum : NSUInteger {
@@ -31,6 +31,8 @@ typedef enum : NSUInteger {
 @property (nonatomic, retain) NSMutableDictionary<NSNumber *, UIImage *> * userProfileImageCache;
 
 @property (nonatomic, strong) NSMutableDictionary<NSNumber *, UIImage *> * imageCache;
+
+@property (nonatomic) CGFloat textViewWidth;
 
 @end
 
@@ -53,6 +55,13 @@ typedef enum : NSUInteger {
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+	UITextView *tv = object;
+	CGFloat topCorrect = ([tv bounds].size.height - [tv contentSize].height * [tv zoomScale])/2.0;
+	topCorrect = ( topCorrect < 0.0 ? 0.0 : topCorrect );
+	tv.contentOffset = (CGPoint){.x = 0, .y = -topCorrect};
 }
 
 - (void)loadMoreTweets {
@@ -89,7 +98,6 @@ typedef enum : NSUInteger {
 				// It is an image and we need to calculate the height given the screen width
 				NSDictionary * imageSizes = [tweet[@"entities"][@"media"] firstObject][@"sizes"];
 				NSNumber * imageHeight = imageSizes[@"large"][@"h"], * imageWidth = imageSizes[@"large"][@"w"];
-				NSLog(@"IMAGE SIZES: %@", imageSizes);
 				
 				CGFloat imageWidthFloat = [imageWidth floatValue], imageHeightFloat = [imageHeight floatValue];
 				
@@ -98,8 +106,18 @@ typedef enum : NSUInteger {
 				
 				return cellHeight;
 			} else {
-				// It is a text cell and we can return the placeholder for now
-				return textCellHeight;
+				if (self.textViewWidth == 0) {
+					return textCellHeight;
+				}
+				
+				NSString * tweetText = tweet[@"text"];
+				NSAttributedString * attributedString = [[NSAttributedString alloc] initWithString:tweetText attributes:@{NSFontAttributeName : [UIFont systemFontOfSize:17.0]}];
+				CGFloat textViewHeight = [self textViewHeightForAttributedText:attributedString andWidth: self.textViewWidth];
+				
+				CGFloat otherHeight = 50;
+				CGFloat dynamicHeight = textViewHeight + otherHeight;
+				
+				return dynamicHeight > textCellHeight ? dynamicHeight : textCellHeight;
 			}
 		}
 		
@@ -108,6 +126,14 @@ typedef enum : NSUInteger {
         return loadMoreCellHeight;
     }
     return 0;
+}
+
+- (CGFloat)textViewHeightForAttributedText:(NSAttributedString *)text andWidth:(CGFloat)width
+{
+	UITextView *textView = [[UITextView alloc] init];
+	[textView setAttributedText:text];
+	CGSize size = [textView sizeThatFits:CGSizeMake(width, FLT_MAX)];
+	return size.height;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -140,26 +166,76 @@ typedef enum : NSUInteger {
 			cell = [tableView dequeueReusableCellWithIdentifier:textCellReuse forIndexPath:indexPath];
 			
 			// Configure the cell...
-			
-			
 			TweetTextTableViewCell * textCell = (TweetTextTableViewCell *)cell;
 			
 			// Setup properties
-			textCell.usernameLabel.text = tweet[@"user"][@"name"];
+			textCell.handleLabel.text = tweet[@"user"][@"name"];
+			textCell.screenNameLabel.text = tweet[@"user"][@"screen_name"];
+			
+			// Set inset
 			textCell.tweetTextView.text = tweet[@"text"];
+			if (self.textViewWidth == 0) {
+				self.textViewWidth = textCell.tweetTextView.frame.size.width;
+			}
+			[textCell.tweetTextView addObserver:self forKeyPath:@"contentSize" options:(NSKeyValueObservingOptionNew) context:NULL];
+			[textCell.tweetTextView setContentInset:UIEdgeInsetsMake(0, 0, 0, 0)];
 			
-			textCell.createdDateLabel.text = tweet[@"created_at"];
+			// How long ago was it posted?
+			// Wed Jun 29 6:52:07 +0000 2016
+			NSString * timeSinceString = @"";
+			NSString * dateString = tweet[@"created_at"];
+			NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
+			formatter.dateFormat = @"EEE MMM dd HH:mm:ss ZZZ yyyy";
+			NSDate * date = [formatter dateFromString: dateString];
+			NSTimeInterval interval = 0 - [date timeIntervalSinceNow];
+			int seconds = floor(interval);
+			int minutes = floor(seconds / 60);
+			int hours = floor(minutes / 60);
+			int days = floor(hours / 24);
+			int weeks = floor(days / 7);
+			int months = floor(weeks / 52);
+			int years = floor(months / 12);
+			if (years > 0) {
+				timeSinceString = [NSString stringWithFormat:@"%d years ago", years];
+			} else if (months > 0) {
+				timeSinceString = [NSString stringWithFormat:@"%d months ago", months];
+			} else if (days > 0) {
+				timeSinceString = [NSString stringWithFormat:@"%d days ago", days];
+			} else if (hours > 0) {
+				timeSinceString = [NSString stringWithFormat:@"%d hours ago", hours];
+			} else if (minutes > 0) {
+				timeSinceString = [NSString stringWithFormat:@"%d minutes ago", minutes];
+			} else if (seconds > 0) {
+				timeSinceString = [NSString stringWithFormat:@"%d seconds ago", seconds];
+			} else {
+				timeSinceString = @"now";
+			}
+			textCell.createdDateLabel.text = timeSinceString;
 			
-			textCell.favoritedLabel.text = [tweet[@"favorited"]  isEqual: @(YES)] ? @"F" : @"NF";
-			textCell.favoritesCountLabel.text = [(NSNumber *)tweet[@"favorite_count"] stringValue];
-			textCell.retweetedLabel.text = [tweet[@"retweeted"] isEqual: @(YES)] ? @"R" : @"NR";
-			textCell.retweetCountLabel.text = [(NSNumber *)tweet[@"retweet_count"] stringValue];
+			
+			textCell.favoritesCountLabel.text = [NSString stringWithFormat:@"%@ favorites", (NSNumber *)tweet[@"favorite_count"]];
+			if ([tweet[@"favorited"]  isEqual: @(YES)]) {
+				textCell.favoritesCountLabel.font = [UIFont boldSystemFontOfSize:12.0];
+			} else {
+				textCell.favoritesCountLabel.font = [UIFont systemFontOfSize:12.0];
+			}
+			
+			textCell.retweetCountLabel.text = [NSString stringWithFormat:@"%@ retweets", (NSNumber *)tweet[@"retweet_count"]];
+			if ([tweet[@"retweeted"] isEqual: @(YES)]) {
+				textCell.retweetCountLabel.font = [UIFont boldSystemFontOfSize:12.0];
+			} else {
+				textCell.retweetCountLabel.font = [UIFont systemFontOfSize:12.0];
+			}
 			
 			UIImage * userAvatarImage = [self.userProfileImageCache objectForKey: userID];
 			if(userAvatarImage == nil) {
 				[self.timeline getProfilePictureForUserID: tweet[@"user"][@"id"]];
 			} else {
-				textCell.userAvatarImageView.image = [self.userProfileImageCache objectForKey:userID];
+				UIImageView * imageView = textCell.userAvatarImageView;
+				
+				imageView.image = userAvatarImage;
+				imageView.layer.cornerRadius = imageView.frame.size.width / 2;
+				imageView.layer.masksToBounds = YES;
 			}
 		}
 		
@@ -211,7 +287,7 @@ typedef enum : NSUInteger {
 
 - (void)timeline:(UserTimeline *)timeline didFinishDownloadingProfileImageData:(NSData *)imageData forUserID:(NSNumber *)userID {
     UIImage * image = [UIImage imageWithData:imageData];
-    
+	
     [self.userProfileImageCache setObject:image forKey:userID];
     
     dispatch_async(dispatch_get_main_queue(), ^{ // Make sure it happens on the main thread

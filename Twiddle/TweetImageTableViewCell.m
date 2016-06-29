@@ -8,6 +8,14 @@
 
 #import "TweetImageTableViewCell.h"
 
+@interface TweetImageTableViewCell()
+
+@property (nonatomic) IBInspectable CGFloat textViewInsetX;
+
+@property (nonatomic) IBInspectable CGFloat textViewInsetY;
+
+@end
+
 @implementation TweetImageTableViewCell
 
 - (void)awakeFromNib {
@@ -20,5 +28,7 @@
 
     // Configure the view for the selected state
 }
+
+
 
 @end
