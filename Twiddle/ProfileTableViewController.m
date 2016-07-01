@@ -8,6 +8,7 @@
 
 #import "ProfileTableViewController.h"
 
+#import "UserTimeline.h"
 #import "ProfileHeaderTableViewCell.h"
 #import "ProfileInfoTableViewCell.h"
 
@@ -80,13 +81,57 @@ typedef enum : NSUInteger {
 		cell = [tableView dequeueReusableCellWithIdentifier:headerCellReuse forIndexPath:indexPath];
 		ProfileHeaderTableViewCell * c = (ProfileHeaderTableViewCell *)cell;
 		
-		//c.coverPhotoImageView
+		UserTimeline * timeline = [UserTimeline sharedTimeline];
+		
+		// Download the profile banner
+		// profile_banner_url
+		if (c.coverPhotoImageView.image == nil) {
+			[timeline getImageWithURL:self.user[@"profile_banner_url"] withCompletion:^(NSData *imageData, NSError *error) {
+				if (error) {
+					NSLog(@"%@", error.localizedDescription);
+				} else {
+					UIImage * image = [UIImage imageWithData: imageData];
+					c.coverPhotoImageView.image = image;
+					[self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+				}
+			}];
+		}
+		
+		// Get the avatar
 		//c.avatarImageView
+		if (c.avatarImageView.image == nil) {
+			[timeline getImageWithURL:self.user[@"profile_image_url"] withCompletion:^(NSData *imageData, NSError *error) {
+				if (error) {
+					NSLog(@"%@", error.localizedDescription);
+				} else {
+					UIImage * image = [UIImage imageWithData: imageData];
+					c.avatarImageView.image = image;
+					[self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+				}
+			}];
+		}
+		
 		//c.verifiedImageView
+		if ([self.user[@"verified"] isEqual: @(YES)]) {
+			NSLog(@"THE USER IS VERIFIED");
+		}
+		
 		c.handleLabel.text = self.user[@"name"];
 		c.usernameLabel.text = [NSString stringWithFormat:@"@%@", self.user[@"screen_name"]];
-		//c.createdAtLabel.text
+		
+		// Format the creation date
+		NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
+		formatter.dateFormat = @"EEE MMM dd HH:mm:ss ZZZ yyyy";
+		NSDate * date = [formatter dateFromString: self.user[@"created_at"]];
+		formatter.dateFormat = @"MMM dd, yyyy";
+		c.createdAtLabel.text = [formatter stringFromDate:date];
+		
 		//c.locationLabel.text
+		NSString * location = self.user[@"location"];
+		if (location != nil) {
+			c.locationLabel.text = location;
+		}
+		
 		c.descriptionLabel.text = self.user[@"description"];
 								
 	} else if (indexPath.section == ProfileSectionInfo) {

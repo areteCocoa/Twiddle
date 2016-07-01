@@ -10,6 +10,8 @@
 
 @protocol UserTimelineDelegate;
 
+typedef void(^UserTimelineImageDownloadCompletion)(NSData * imageData, NSError * error);
+
 /**
  *  UserTimeline class is responsible for managing an instance of the user's timeline
  *  as well as getting tweets from the timeline and getting more tweets from the
@@ -32,6 +34,8 @@
  *  Whether the user is logged in or not - YES if they are, NO otherwise.
  */
 @property (nonatomic, readonly) BOOL loggedIn;
+
++ (id)sharedTimeline;
 
 /**
  *	Attempts to log in the user via the built in Twitter account support.
@@ -80,6 +84,10 @@
  *  @param imageID the ID of the image to be found
  */
 - (void)getImageForImageID: (NSNumber *)imageID;
+
+- (void)getImageForImageID:(NSNumber *)imageID withCompletion: (UserTimelineImageDownloadCompletion)completion;
+
+- (void)getImageWithURL: (NSString *)url withCompletion: (UserTimelineImageDownloadCompletion)completion;
 
 @end
 

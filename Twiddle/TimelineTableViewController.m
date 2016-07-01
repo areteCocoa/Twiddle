@@ -11,6 +11,7 @@
 #import "UserTimeline.h"
 #import "TweetTextTableViewCell.h"
 #import "TweetImageTableViewCell.h"
+#import "ProfileTableViewController.h"
 
 static NSString * textCellReuse = @"text_cell";
 static NSString * imageCellReuse = @"image_cell";
@@ -314,14 +315,19 @@ typedef enum : NSUInteger {
     [self.timeline refreshTimeline];
 }
 
-/*
+
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
+	if ([segue.identifier isEqualToString:@"profile_segue"]) {
+		ProfileTableViewController * controller = segue.destinationViewController;
+		NSDictionary * user = self.timeline.tweets[self.tableView.indexPathForSelectedRow.row][@"user"];
+		controller.user = user;
+	}
 }
-*/
+
 
 @end

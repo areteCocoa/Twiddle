@@ -60,7 +60,7 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
 /**
  *  A cache of the NSData for the images that have been downloaded
  */
-@property (nonatomic, strong) NSMutableDictionary<NSNumber *, NSData *> * mutableImageData;
+@property (nonatomic, strong) NSMutableDictionary<id, NSData *> * mutableImageData;
 
 /**
  *  A cache of user image data given their user ID
@@ -85,6 +85,10 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
 @property (nonatomic, retain) NSMutableDictionary<NSNumber *, NSNumber *> * userIDForTask;
 
 @property (nonatomic, strong) NSMutableDictionary<NSNumber *, NSNumber *> * imageIDForTask;
+
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, NSString *> * imageURLForTask;
+
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, id> * completionForTask;
 
 /**
  *  Sends a request to a Twitter URL with params as parameters and calls handler with the data when
@@ -119,6 +123,15 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
 
 @implementation UserTimeline
 
++ (id)sharedTimeline {
+	static UserTimeline * sharedTimeline = nil;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		sharedTimeline = [[self alloc] init];
+	});
+	return sharedTimeline;
+}
+
 - (id)init {
     self = [super init];
     
@@ -133,6 +146,8 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
 	
     self.userIDForTask = [[NSMutableDictionary alloc] init];
 	self.imageIDForTask = [NSMutableDictionary dictionary];
+	self.imageURLForTask = [NSMutableDictionary dictionary];
+	self.completionForTask = [NSMutableDictionary dictionary];
     _loggedIn = NO;
     
     NSURLSessionConfiguration * configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
@@ -382,16 +397,75 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
 	[d isEqual:a];
 }
 
+- (void)getImageForImageID:(NSNumber *)imageID withCompletion:(UserTimelineImageDownloadCompletion)completion {
+	NSData * imageData = [self.mutableImageData objectForKey:imageID];
+	if (imageData != nil) {
+		if (completion) {
+			completion(imageData, nil);
+		} else {
+			[self.delegate timeline:self didFinishDownloadingImage:imageData forImageID:imageID];
+		}
+		return;
+	}
+	
+	NSDictionary * imageMetadata = self.mutableImageEntityCache[imageID];
+	if (imageMetadata != nil) {
+		// We have the URL cached, we can just download it
+		NSString * url = imageMetadata[@"media_url_https"];
+		[self downloadImageForImageID:imageID withImageURL:url];
+		return;
+	}
+	
+	NSLog(@"Attempted to download an image with ID for which we have no metadata!");
+}
+
 - (void)downloadImageForImageID: (NSNumber *)imageID withImageURL: (NSString *)url {
+	[self downloadImageForImageID:imageID withImageURL:url withCompletion:nil];
+}
+
+- (void)downloadImageForImageID: (NSNumber *)imageID withImageURL:(NSString *)url withCompletion: (UserTimelineImageDownloadCompletion)completion {
 	// Make sure the item is not queued already
 	if (![self.imageIDForTask.allValues containsObject:imageID]) {
 		NSLog(@"Downloading image with ID: %@", imageID);
 		
 		NSURLSessionDownloadTask * task = [self.session downloadTaskWithURL:[NSURL URLWithString: url]];
 		[self.imageIDForTask setObject:imageID forKey:[NSNumber numberWithInteger: task.taskIdentifier]];
+		
+		if (completion != nil) {
+			[self.completionForTask setObject:completion forKey:[NSNumber numberWithInteger: task.taskIdentifier]];
+		}
+		
 		[task resume];
 	} else {
+		NSLog(@"Something else tried to download an image that is already queued to download.");
+	}
+}
+
+- (void)getImageWithURL: (NSString *)url withCompletion: (UserTimelineImageDownloadCompletion)completion {
+	if (!url) {
+		NSLog(@"Attempted to download an image but no url was passed!");
+		return;
+	}
+	
+	NSData * imageData = self.mutableImageData[url];
+	if (imageData) {
+		completion(imageData, nil);
+	}
+	
+	// Make sure the item is not queued already
+	if (![self.imageURLForTask.allValues containsObject: url]) {
+		NSLog(@"Downloading image with URL: %@", url);
 		
+		NSURLSessionDownloadTask * task = [self.session downloadTaskWithURL:[NSURL URLWithString: url]];
+		[self.imageURLForTask setObject:url forKey:[NSNumber numberWithInteger: task.taskIdentifier]];
+		
+		if (completion != nil) {
+			[self.completionForTask setObject:completion forKey:[NSNumber numberWithInteger: task.taskIdentifier]];
+		}
+		
+		[task resume];
+	} else {
+		NSLog(@"Something else tried to download an image that is already queued to download.");
 	}
 }
 
@@ -416,17 +490,31 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
 		NSNumber * imageID = [self.imageIDForTask objectForKey:taskIdentifier];
 		[self.imageIDForTask removeObjectForKey:taskIdentifier];
 		
-		[self.delegate timeline:self didFinishDownloadingImage:data forImageID: imageID];
-		return;
+		UserTimelineImageDownloadCompletion completion = [self.completionForTask objectForKey:taskIdentifier];
+		if (completion) {
+			completion(data, nil);
+			[self.completionForTask removeObjectForKey:taskIdentifier];
+		} else {
+			[self.delegate timeline:self didFinishDownloadingImage:data forImageID: imageID];
+		}
 	} else if ([self.userIDForTask.allKeys containsObject:taskIdentifier]) {
 		// It's a profile image
 		NSNumber * userID = [self.userIDForTask objectForKey:taskIdentifier];
 		[self.userIDForTask removeObjectForKey:taskIdentifier];
 		
 		[self.delegate timeline:self didFinishDownloadingProfileImageData:data forUserID:userID];
-		return;
+	} else if ([self.imageURLForTask.allKeys containsObject:taskIdentifier]) {
+		// It's an image
+		[self.imageURLForTask removeObjectForKey:taskIdentifier];
+		
+		UserTimelineImageDownloadCompletion completion = [self.completionForTask objectForKey:taskIdentifier];
+		if (completion) {
+			completion(data, nil);
+		}
 	}
-	NSLog(@"I have downloaded data and I don't know what to do with it!");
+	else {
+		NSLog(@"UserTimeline downloaded data and doesn't know what to do with it!");
+	}
 }
 
 @end
