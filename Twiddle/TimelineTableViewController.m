@@ -13,8 +13,6 @@
 #import "TweetImageTableViewCell.h"
 #import "ProfileTableViewController.h"
 
-static NSString * textCellReuse = @"text_cell";
-static NSString * imageCellReuse = @"image_cell";
 static NSString * loadMoreReuse = @"load_more_cell";
 
 static CGFloat textCellHeight = 90;

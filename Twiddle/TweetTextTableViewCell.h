@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+static NSString * textCellReuse = @"text_cell";
+
 @interface TweetTextTableViewCell : UITableViewCell
 
 @property (strong, nonatomic) IBOutlet UILabel *handleLabel;

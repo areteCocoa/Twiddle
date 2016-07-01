@@ -9,6 +9,8 @@
 #import "ProfileTableViewController.h"
 
 #import "UserTimeline.h"
+#import "TweetTextTableViewCell.h"
+#import "TweetImageTableViewCell.h"
 #import "ProfileHeaderTableViewCell.h"
 #import "ProfileInfoTableViewCell.h"
 
@@ -39,11 +41,8 @@ typedef enum : NSUInteger {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+	[self.tableView registerNib:[UINib nibWithNibName:@"TweetTextTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:textCellReuse];
+	[self.tableView registerNib:[UINib nibWithNibName:@"TweetImageTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:imageCellReuse];
 }
 
 - (void)didReceiveMemoryWarning {

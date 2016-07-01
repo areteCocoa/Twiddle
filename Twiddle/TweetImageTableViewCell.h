@@ -10,6 +10,8 @@
 
 #import "TweetTextTableViewCell.h"
 
+static NSString * imageCellReuse = @"image_cell";
+
 @interface TweetImageTableViewCell : TweetTextTableViewCell
 
 @property (nonatomic, strong) IBOutlet UIImageView * contentImageView;
