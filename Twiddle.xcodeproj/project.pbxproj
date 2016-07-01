@@ -18,6 +18,7 @@
 		541F6D9D1D1708D500740086 /* TimelineTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 541F6D9C1D1708D500740086 /* TimelineTableViewController.m */; };
 		54340F8C1D267A4100BBCE3F /* ProfileTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 54340F8B1D267A4100BBCE3F /* ProfileTableViewController.m */; };
 		54340F8F1D267E5200BBCE3F /* ProfileHeaderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 54340F8E1D267E5200BBCE3F /* ProfileHeaderTableViewCell.m */; };
+		54340F921D267E6900BBCE3F /* ProfileInfoTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 54340F911D267E6900BBCE3F /* ProfileInfoTableViewCell.m */; };
 		545BC7FA1D21425A00950572 /* TweetImageTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 545BC7F91D21425A00950572 /* TweetImageTableViewCell.m */; };
 		549D875C1D17EED40068DD85 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 549D875A1D17EED40068DD85 /* Fabric.framework */; };
 		549D875D1D17EED40068DD85 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 549D875B1D17EED40068DD85 /* Crashlytics.framework */; };
@@ -60,6 +61,8 @@
 		54340F8B1D267A4100BBCE3F /* ProfileTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileTableViewController.m; sourceTree = "<group>"; };
 		54340F8D1D267E5200BBCE3F /* ProfileHeaderTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileHeaderTableViewCell.h; sourceTree = "<group>"; };
 		54340F8E1D267E5200BBCE3F /* ProfileHeaderTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileHeaderTableViewCell.m; sourceTree = "<group>"; };
+		54340F901D267E6900BBCE3F /* ProfileInfoTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileInfoTableViewCell.h; sourceTree = "<group>"; };
+		54340F911D267E6900BBCE3F /* ProfileInfoTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileInfoTableViewCell.m; sourceTree = "<group>"; };
 		545BC7F81D21425A00950572 /* TweetImageTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetImageTableViewCell.h; sourceTree = "<group>"; };
 		545BC7F91D21425A00950572 /* TweetImageTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TweetImageTableViewCell.m; sourceTree = "<group>"; };
 		549D875A1D17EED40068DD85 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
@@ -134,6 +137,8 @@
 				541F6D991D17086900740086 /* Main.storyboard */,
 				54340F8D1D267E5200BBCE3F /* ProfileHeaderTableViewCell.h */,
 				54340F8E1D267E5200BBCE3F /* ProfileHeaderTableViewCell.m */,
+				54340F901D267E6900BBCE3F /* ProfileInfoTableViewCell.h */,
+				54340F911D267E6900BBCE3F /* ProfileInfoTableViewCell.m */,
 				54340F8A1D267A4100BBCE3F /* ProfileTableViewController.h */,
 				54340F8B1D267A4100BBCE3F /* ProfileTableViewController.m */,
 				541F6D9B1D1708D500740086 /* TimelineTableViewController.h */,
@@ -299,6 +304,7 @@
 				54D585721D187757008564F1 /* UserTimeline.m in Sources */,
 				54340F8F1D267E5200BBCE3F /* ProfileHeaderTableViewCell.m in Sources */,
 				54340F8C1D267A4100BBCE3F /* ProfileTableViewController.m in Sources */,
+				54340F921D267E6900BBCE3F /* ProfileInfoTableViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

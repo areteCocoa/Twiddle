@@ -256,6 +256,12 @@ typedef enum : NSUInteger {
 	}
 }
 
+#pragma mark - UITableViewDelegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+	[self performSegueWithIdentifier:@"profile_segue" sender:self];
+}
+
 #pragma mark - UserTimelineDelegate
 
 - (void)timeline:(UserTimeline *)timeline didLoginWithError:(NSError *)error {

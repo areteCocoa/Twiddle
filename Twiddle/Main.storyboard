@@ -277,16 +277,16 @@
             </objects>
             <point key="canvasLocation" x="1625" y="-17"/>
         </scene>
-        <!--Table View Controller-->
+        <!--Profile Table View Controller-->
         <scene sceneID="kFc-tF-fV9">
             <objects>
-                <tableViewController id="FDq-Hl-ccO" sceneMemberID="viewController">
+                <tableViewController id="FDq-Hl-ccO" customClass="ProfileTableViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="159" sectionHeaderHeight="28" sectionFooterHeight="28" id="cpv-3m-Zgw">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="profile_header_image_cell" rowHeight="240" id="RnF-E0-F6k">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="profile_header_image_cell" rowHeight="240" id="RnF-E0-F6k" customClass="ProfileHeaderTableViewCell">
                                 <rect key="frame" x="0.0" y="92" width="600" height="240"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="RnF-E0-F6k" id="oI3-DX-nBT">
@@ -311,8 +311,8 @@
                                             <color key="textColor" white="0.28000000000000003" alpha="1" colorSpace="calibratedWhite"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="created at" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p37-ti-1bK">
-                                            <rect key="frame" x="8" y="169" width="267" height="17"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="user bio" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="adX-cq-tCQ">
+                                            <rect key="frame" x="8" y="187" width="584" height="27"/>
                                             <fontDescription key="fontDescription" type="system" weight="light" pointSize="14"/>
                                             <color key="textColor" white="0.28000000000000003" alpha="1" colorSpace="calibratedWhite"/>
                                             <nil key="highlightedColor"/>
@@ -343,8 +343,8 @@
                                                 <constraint firstAttribute="width" constant="18" id="gil-hs-f7d"/>
                                             </constraints>
                                         </imageView>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="user bio" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="adX-cq-tCQ">
-                                            <rect key="frame" x="8" y="187" width="584" height="27"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="created at" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p37-ti-1bK">
+                                            <rect key="frame" x="8" y="169" width="267" height="17"/>
                                             <fontDescription key="fontDescription" type="system" weight="light" pointSize="14"/>
                                             <color key="textColor" white="0.28000000000000003" alpha="1" colorSpace="calibratedWhite"/>
                                             <nil key="highlightedColor"/>
@@ -383,8 +383,18 @@
                                         </mask>
                                     </variation>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="avatarImageView" destination="ZRB-Eo-es2" id="xxi-35-sge"/>
+                                    <outlet property="coverPhotoImageView" destination="9hd-Q3-s15" id="8UO-xm-ebK"/>
+                                    <outlet property="createdAtLabel" destination="p37-ti-1bK" id="WeQ-Pj-fRt"/>
+                                    <outlet property="descriptionLabel" destination="adX-cq-tCQ" id="ddU-he-LY6"/>
+                                    <outlet property="handleLabel" destination="3IW-Ny-Oji" id="nBn-eX-Zhy"/>
+                                    <outlet property="locationLabel" destination="w6B-ag-ICm" id="nsT-cs-dEp"/>
+                                    <outlet property="usernameLabel" destination="DNw-x6-wzv" id="edu-zI-HAf"/>
+                                    <outlet property="verifiedImageView" destination="YfO-SD-pAV" id="3PB-Li-wi2"/>
+                                </connections>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="profile_header_info_cell" rowHeight="60" id="zhq-za-yEF">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="profile_header_info_cell" rowHeight="60" id="zhq-za-yEF" customClass="ProfileInfoTableViewCell">
                                 <rect key="frame" x="0.0" y="332" width="600" height="60"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="zhq-za-yEF" id="yfc-Aw-ow2">

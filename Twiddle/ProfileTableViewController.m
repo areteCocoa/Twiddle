@@ -8,6 +8,26 @@
 
 #import "ProfileTableViewController.h"
 
+#import "ProfileHeaderTableViewCell.h"
+#import "ProfileInfoTableViewCell.h"
+
+static NSString * headerCellReuse = @"profile_header_image_cell";
+static NSString * infoCellReuse = @"profile_header_info_cell";
+static NSString * actionCellReuse = @"profile_action_cell";
+static NSString * timelineHeaderCellReuse = @"profile_timeline_type_cell";
+
+const CGFloat headerCellHeight = 255;
+const CGFloat infoCellHeight = 60;
+const CGFloat actionCellHeight = 40;
+const CGFloat timelineHeaderHeight = 28;
+
+typedef enum : NSUInteger {
+	ProfileSectionHeader,
+	ProfileSectionInfo,
+	ProfileSectionAction,
+	ProfileSectionTimelineHeaderSection,
+} ProfileTableViewSection;
+
 @interface ProfileTableViewController ()
 
 @end
@@ -32,58 +52,67 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-#warning Incomplete implementation, return the number of sections
-    return 0;
+    return 4;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-#warning Incomplete implementation, return the number of rows
+	if (self.user == nil) {
+		return 0;
+	}
+	
+	if (section == ProfileSectionHeader) {
+		return 1;
+	} else if (section == ProfileSectionInfo) {
+		return 1;
+	} else if (section == ProfileSectionAction) {
+		
+	} else if (section == ProfileSectionTimelineHeaderSection) {
+		
+	}
     return 0;
 }
 
-/*
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
-    
-    // Configure the cell...
+	UITableViewCell * cell;
+	
+	if (indexPath.section == ProfileSectionHeader) {
+		cell = [tableView dequeueReusableCellWithIdentifier:headerCellReuse forIndexPath:indexPath];
+		ProfileHeaderTableViewCell * c = (ProfileHeaderTableViewCell *)cell;
+		
+		//c.coverPhotoImageView
+		//c.avatarImageView
+		//c.verifiedImageView
+		c.handleLabel.text = self.user[@"name"];
+		c.usernameLabel.text = [NSString stringWithFormat:@"@%@", self.user[@"screen_name"]];
+		//c.createdAtLabel.text
+		//c.locationLabel.text
+		c.descriptionLabel.text = self.user[@"description"];
+								
+	} else if (indexPath.section == ProfileSectionInfo) {
+		cell = [tableView dequeueReusableCellWithIdentifier:infoCellReuse forIndexPath:indexPath];
+		ProfileInfoTableViewCell * c = (ProfileInfoTableViewCell *)cell;
+	} else if (indexPath.section == ProfileSectionAction) {
+		cell = [tableView dequeueReusableCellWithIdentifier:actionCellReuse forIndexPath:indexPath];
+	} else if (indexPath.section == ProfileSectionTimelineHeaderSection) {
+		cell = [tableView dequeueReusableCellWithIdentifier:timelineHeaderCellReuse forIndexPath:indexPath];
+	}
     
     return cell;
 }
-*/
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (indexPath.section == ProfileSectionHeader) {
+		return headerCellHeight;
+	} else if (indexPath.section == ProfileSectionInfo) {
+		return infoCellHeight;
+	} else if (indexPath.section == ProfileSectionAction) {
+		return actionCellHeight;
+	} else if (indexPath.section == ProfileSectionTimelineHeaderSection) {
+		return timelineHeaderHeight;
+	}
+	return 0;
 }
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
 
 /*
 #pragma mark - Navigation

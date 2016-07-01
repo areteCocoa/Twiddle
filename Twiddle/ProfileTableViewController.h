@@ -10,4 +10,6 @@
 
 @interface ProfileTableViewController : UITableViewController
 
+@property (nonatomic, strong) NSDictionary * user;
+
 @end
