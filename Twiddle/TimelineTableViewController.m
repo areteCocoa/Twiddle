@@ -41,7 +41,10 @@ typedef enum : NSUInteger {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+	
+	[self.tableView registerNib:[UINib nibWithNibName:@"TweetTextTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:textCellReuse];
+	[self.tableView registerNib:[UINib nibWithNibName:@"TweetImageTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:imageCellReuse];
+	
     self.view.backgroundColor = [UIColor blueColor];
     
     self.userProfileImageCache = [[NSMutableDictionary alloc] init];
