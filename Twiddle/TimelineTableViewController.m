@@ -25,7 +25,7 @@ typedef enum : NSUInteger {
     LoadMoreSection,
 } TimelineTableViewControllerSection;
 
-@interface TimelineTableViewController () <UserTimelineDelegate>
+@interface TimelineTableViewController ()
 
 @property (nonatomic, retain) UserTimeline * timeline;
 
@@ -47,10 +47,15 @@ typedef enum : NSUInteger {
     self.userProfileImageCache = [[NSMutableDictionary alloc] init];
 	self.imageCache = [NSMutableDictionary dictionary];
     
-    self.timeline = [[UserTimeline alloc] init];
-    self.timeline.delegate = self;
-    
-    [self.timeline login];
+    self.timeline = [UserTimeline sharedTimeline];
+	
+    [self.timeline loginWithCompletion:^(NSError *error) {
+		if (!error) {
+			[self loadInitialTweets];
+		} else {
+			NSLog(@"TimelineTableViewController attempted to login user but there was an error: %@", error.localizedDescription);
+		}
+	}];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -58,8 +63,16 @@ typedef enum : NSUInteger {
     // Dispose of any resources that can be recreated.
 }
 
+- (void)loadInitialTweets {
+	[self.timeline getInitalTimelineWithCompletion:^(NSArray *newData, NSArray *oldData, NSError *error) {
+		[self.tableView reloadData];
+	}];
+}
+
 - (void)loadMoreTweets {
-    [self.timeline getMoreTimeline];
+    [self.timeline getMoreTimelineWithCompletion:^(NSArray *newData, NSArray *oldData, NSError *error) {
+		[self.tableView reloadData];
+	}];
 }
 
 #pragma mark - Table view data source
@@ -152,7 +165,15 @@ typedef enum : NSUInteger {
 			// Load image
 			UIImage * image = self.imageCache[imageID];
 			if (image == nil) {
-				[self.timeline getImageForImageID:imageID];
+				[self.timeline getImageForImageID:imageID withCompletion:^(NSData *imageData, NSError *error) {
+					UIImage * image = [UIImage imageWithData: imageData];
+					
+					[self.imageCache setObject:image forKey:imageID];
+					
+					dispatch_async(dispatch_get_main_queue(), ^{ // Make sure it happens on the main thread
+						[self.tableView reloadData];
+					});
+				}];
 			} else {
 				imageCell.contentImageView.image = image;
 			}
@@ -247,7 +268,15 @@ typedef enum : NSUInteger {
 	
 	UIImage * userAvatarImage = [self.userProfileImageCache objectForKey: userID];
 	if(userAvatarImage == nil) {
-		[self.timeline getProfilePictureForUserID: tweet[@"user"][@"id"]];
+		[self.timeline getProfilePictureForUserID: tweet[@"user"][@"id"] withCompletion:^(NSData *imageData, NSError *error) {
+			UIImage * image = [UIImage imageWithData:imageData];
+			
+			[self.userProfileImageCache setObject:image forKey:userID];
+			
+			dispatch_async(dispatch_get_main_queue(), ^{ // Make sure it happens on the main thread
+				[self.tableView reloadData];
+			});
+		}];
 	} else {
 		UIImageView * imageView = cell.userAvatarImageView;
 		
@@ -265,54 +294,20 @@ typedef enum : NSUInteger {
 
 #pragma mark - UserTimelineDelegate
 
-- (void)timeline:(UserTimeline *)timeline didLoginWithError:(NSError *)error {
-    if (!error) {
-        [timeline getInitalTimeline];
-	} else {
-		NSLog(@"TimelineTableViewController attempted to login user but there was an error: %@", error.localizedDescription);
-	}
-}
-
-- (void)timeline:(UserTimeline *)timeline didGetInitalTimeline:(NSArray *)tweets {
-    [self.tableView reloadData];
-}
-
-- (void)timeline:(UserTimeline *)timeline didGetMoreTimeline:(NSArray *)newTweets {
-    [self.tableView reloadData];
-}
-
-- (void)timeline:(UserTimeline *)timeline didRefreshTimeline:(NSArray *)newTweets {
-    [self.refreshControl endRefreshing];
-    
-    if (newTweets.count != 0) {
-        [self.tableView reloadData];
-    }
-}
-
-- (void)timeline:(UserTimeline *)timeline didFinishDownloadingProfileImageData:(NSData *)imageData forUserID:(NSNumber *)userID {
-    UIImage * image = [UIImage imageWithData:imageData];
-	
-    [self.userProfileImageCache setObject:image forKey:userID];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{ // Make sure it happens on the main thread
-        [self.tableView reloadData];
-    });
-}
-
 - (void)timeline:(UserTimeline *)timeline didFinishDownloadingImage:(NSData *)imageData forImageID:(NSNumber *)imageID {
-	UIImage * image = [UIImage imageWithData: imageData];
 	
-	[self.imageCache setObject:image forKey:imageID];
-	
-	dispatch_async(dispatch_get_main_queue(), ^{ // Make sure it happens on the main thread
-		[self.tableView reloadData];
-	});
 }
 
 #pragma mark - IBActions
 
 - (IBAction)refresh: (UIRefreshControl *)sender {
-    [self.timeline refreshTimeline];
+    [self.timeline refreshTimelineWithCompletion:^(NSArray *newData, NSArray *oldData, NSError *error) {
+		[self.refreshControl endRefreshing];
+		
+		if (newData.count != 0) {
+			[self.tableView reloadData];
+		}
+	}];
 }
 
 

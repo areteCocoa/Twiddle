@@ -20,7 +20,7 @@
  *  @param minID   The smallest tweet id of the request
  *  @param maxID   The largest tweet id of the request
  */
-typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNumber * maxID);
+typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNumber * maxID, NSError * error);
 
 
 
@@ -117,7 +117,7 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
  *  @param userID          the user's userID
  *  @param profileImageURL the URL of the profile image
  */
-- (void)downloadProfileImageForUserID: (NSNumber *)userID withProfileImageURL: (NSString *)profileImageURL;
+- (void)downloadProfileImageForUserID: (NSNumber *)userID withProfileImageURL: (NSString *)profileImageURL withCompletion: (UserTimelineImageDownloadCompletion)completion;
 
 @end
 
@@ -156,78 +156,66 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
     return self;
 }
 
-- (void)login {
-    [[Twitter sharedInstance] logInWithCompletion:^(TWTRSession *session, NSError *error) {
-        if (session) {
-            NSLog(@"Successfully signed in as %@.", [session userName]);
-            _loggedIn = YES;
-            [self.delegate timeline:self didLoginWithError:nil];
-        } else {
-            NSLog(@"Attempted to log in but there was an error: %@", [error localizedDescription]);
-            _loggedIn = NO;
-            [self.delegate timeline:self didLoginWithError:error];
-        }
-    }];
-}
-
 - (void)sendGetRequestToTwitterURL: (NSString *)url withParams: (NSDictionary *)params withHandler: (void (^)(NSData * data))handler {
-    NSString * userID = [Twitter sharedInstance].sessionStore.session.userID;
-    TWTRAPIClient * client = [[TWTRAPIClient alloc] initWithUserID: userID];
-    
-    NSError *clientError;
-    
-    // Params is allowed to be null so we must make sure that it is not null when we create the request
-    if (params == nil) {
-        params = [NSDictionary dictionary];
-    }
-    
-    NSURLRequest *request = [client URLRequestWithMethod:@"GET" URL:url parameters:params error:&clientError];
-    
-    if (request) {
-        [client sendTwitterRequest:request completion:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-            if (data) {
-                handler(data);
-            }
-            else {
-                NSLog(@"GET request to Twitter at endpoint %@ failed due to error: %@", url, connectionError.localizedDescription);
-            }
-        }];
-    }
-    else if (clientError) {
-        NSLog(@"Client error creating NSURLRequest: %@", clientError.localizedDescription);
-    } else {
-        NSLog(@"Something went very, very wrong.");
-    }
+	NSString * userID = [Twitter sharedInstance].sessionStore.session.userID;
+	TWTRAPIClient * client = [[TWTRAPIClient alloc] initWithUserID: userID];
+	
+	NSError *clientError;
+	
+	// Params is allowed to be null so we must make sure that it is not null when we create the request
+	if (params == nil) {
+		params = [NSDictionary dictionary];
+	}
+	
+	NSURLRequest *request = [client URLRequestWithMethod:@"GET" URL:url parameters:params error:&clientError];
+	
+	if (request) {
+		[client sendTwitterRequest:request completion:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+			if (data) {
+				handler(data);
+			}
+			else {
+				NSLog(@"GET request to Twitter at endpoint %@ failed due to error: %@", url, connectionError.localizedDescription);
+			}
+		}];
+	}
+	else if (clientError) {
+		NSLog(@"Client error creating NSURLRequest: %@", clientError.localizedDescription);
+	} else {
+		NSLog(@"Something went very, very wrong.");
+	}
 }
 
-- (void)getInitalTimeline {
-    [self getTimelineWithCount:-1 withMaxID:-1 sinceID:-1 withCompletion:^(NSArray *newData, NSNumber *minID, NSNumber *maxID) {
-        if (self.delegate) {
-            [self.delegate timeline:self didGetInitalTimeline:self.tweets];
-        }
+- (void)loginWithCompletion:(nonnull UserTimelineLoginCompletion)completion {
+	[[Twitter sharedInstance] logInWithCompletion:^(TWTRSession *session, NSError *error) {
+		if (session) {
+			NSLog(@"Successfully signed in as %@.", [session userName]);
+			_loggedIn = YES;
+		} else {
+			NSLog(@"Attempted to log in but there was an error: %@", [error localizedDescription]);
+			_loggedIn = NO;
+		}
+		completion(error);
+	}];
+}
+
+- (void)getInitalTimelineWithCompletion:(UserTimelineTweetDownloadCompletion)completion {
+    [self getTimelineWithCount:-1 withMaxID:-1 sinceID:-1 withCompletion:^(NSArray *newData, NSNumber *minID, NSNumber *maxID, NSError * error) {
+		completion(newData, self.tweets, error);
     }];
 }
 
-- (void)getMoreTimeline {
+- (void)getMoreTimelineWithCompletion:(UserTimelineTweetDownloadCompletion)completion {
     NSInteger maxID = [self.minID integerValue] - 1;
-    [self getTimelineWithCount:20 withMaxID:maxID sinceID:-1 withCompletion:^(NSArray *newData, NSNumber* minID, NSNumber * maxID) {
-        if (self.delegate) {
-            [self.delegate timeline:self didGetMoreTimeline:newData];
-        }
+    [self getTimelineWithCount:20 withMaxID:maxID sinceID:-1 withCompletion:^(NSArray *newData, NSNumber* minID, NSNumber * maxID, NSError * error) {
+		completion(newData, self.tweets, error);
     }];
 }
 
-- (void)refreshTimeline {
+- (void)refreshTimelineWithCompletion:(UserTimelineTweetDownloadCompletion)completion {
     NSInteger sinceID = [self.maxID integerValue];
-    [self getTimelineWithCount:20 withMaxID:-1 sinceID:sinceID withCompletion:^(NSArray *newData, NSNumber * minID, NSNumber * maxID) {
-        if (newData.count == 0) {
-            NSLog(@"ALL UPDATED!");
-        } else {
-            NSLog(@"We have more data.");
-        }
-        if (self.delegate) {
-            [self.delegate timeline:self didRefreshTimeline:newData];
-        }
+    [self getTimelineWithCount:20 withMaxID:-1 sinceID:sinceID withCompletion:^(NSArray *newData, NSNumber * minID, NSNumber * maxID, NSError * error) {
+		completion(newData, self.tweets, error);
     }];
 }
 
@@ -308,17 +296,17 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
         
 
         if (completion != nil) {
-            completion(json, requestMaxID, requestMinID);
+			completion(json, requestMaxID, requestMinID, nil);
         }
     }];
 }
 
-- (void)getProfilePictureForUserID:(NSNumber *)userID {
+- (void)getProfilePictureForUserID:(NSNumber *)userID withCompletion:(UserTimelineImageDownloadCompletion)completion {
     NSData * imageData = [self.mutableUserProfileImageData objectForKey:userID];
     if (imageData != nil) {
         // We have the data already, return it through the delegate
         NSLog(@"Requested cached profile image, returning without session request.");
-        [self.delegate timeline:self didFinishDownloadingProfileImageData:[imageData copy] forUserID:userID];
+		completion(imageData, nil);
         return;
     }
     
@@ -327,7 +315,7 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
     if (user != nil) {
         if ([self.mutableUserProfileImageData objectForKey: user[@"id"]] == 0) {
             // We have the user but not the image; download the image now
-            [self downloadProfileImageForUserID:userID withProfileImageURL: user[@"profile_image_url_https"]];
+            [self downloadProfileImageForUserID:userID withProfileImageURL: user[@"profile_image_url_https"] withCompletion:completion];
             return;
         }
     }
@@ -354,57 +342,31 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
             [self.mutableUserCache setObject:json forKey:returnedUserID];
         }
         
-        [self downloadProfileImageForUserID:userID withProfileImageURL: @""];
+        [self downloadProfileImageForUserID:userID withProfileImageURL: @"" withCompletion:completion];
     }];
 }
 
-- (void)downloadProfileImageForUserID: (NSNumber *)userID withProfileImageURL: (NSString *)profileImageURL {
+- (void)downloadProfileImageForUserID: (NSNumber *)userID withProfileImageURL: (NSString *)profileImageURL withCompletion: (UserTimelineImageDownloadCompletion)completion {
     // Make sure the item is not queued already
     if (![self.userIDForTask.allValues containsObject:userID]) {
         NSLog(@"Downloading profile image for cached user with ID: %@", userID);
         
         NSURLSessionDownloadTask * task = [self.session downloadTaskWithURL:[NSURL URLWithString:profileImageURL]];
-        [self.userIDForTask setObject:userID forKey:[NSNumber numberWithUnsignedInteger: task.taskIdentifier]];
+		NSNumber * taskIdentifier = [NSNumber numberWithUnsignedInteger: task.taskIdentifier];
+		
+        [self.userIDForTask setObject:userID forKey:taskIdentifier];
+		[self.completionForTask setObject:completion forKey:taskIdentifier];
+		
         [task resume];
     } else {
         
     }
 }
 
-- (void)getImageForImageID:(NSNumber *)imageID {
-	NSData * imageData = [self.mutableImageData objectForKey:imageID];
-	if (imageData != nil) {
-		[self.delegate timeline:self didFinishDownloadingImage:imageData forImageID:imageID];
-		return;
-	}
-	
-	NSDictionary * imageMetadata = self.mutableImageEntityCache[imageID];
-	if (imageMetadata != nil) {
-		// We have the URL cached, we can just download it
-		NSString * url = imageMetadata[@"media_url_https"];
-		[self downloadImageForImageID:imageID withImageURL:url];
-		return;
-	}
-	
-	// In the rare occasion that the client wants to download an image that we have not cached
-	// the metadata for yet, we can manually download the image data and then download the
-	// image.
-	
-	// This code will break the world
-	NSLog(@"YOU BROKE ME");
-	id d = [NSMutableDictionary dictionary];
-	id a = [NSArray array];
-	[d isEqual:a];
-}
-
 - (void)getImageForImageID:(NSNumber *)imageID withCompletion:(UserTimelineImageDownloadCompletion)completion {
 	NSData * imageData = [self.mutableImageData objectForKey:imageID];
 	if (imageData != nil) {
-		if (completion) {
-			completion(imageData, nil);
-		} else {
-			[self.delegate timeline:self didFinishDownloadingImage:imageData forImageID:imageID];
-		}
+		completion(imageData, nil);
 		return;
 	}
 	
@@ -412,15 +374,11 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
 	if (imageMetadata != nil) {
 		// We have the URL cached, we can just download it
 		NSString * url = imageMetadata[@"media_url_https"];
-		[self downloadImageForImageID:imageID withImageURL:url];
+		[self downloadImageForImageID:imageID withImageURL:url withCompletion: completion];
 		return;
 	}
 	
 	NSLog(@"Attempted to download an image with ID for which we have no metadata!");
-}
-
-- (void)downloadImageForImageID: (NSNumber *)imageID withImageURL: (NSString *)url {
-	[self downloadImageForImageID:imageID withImageURL:url withCompletion:nil];
 }
 
 - (void)downloadImageForImageID: (NSNumber *)imageID withImageURL:(NSString *)url withCompletion: (UserTimelineImageDownloadCompletion)completion {
@@ -484,33 +442,39 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
 	NSData * data = [NSData dataWithContentsOfURL:location];
 	NSNumber * taskIdentifier = [NSNumber numberWithInteger:downloadTask.taskIdentifier];
+	NSString * url = downloadTask.originalRequest.URL.absoluteString;
+	
+	id completion = [self.completionForTask objectForKey:taskIdentifier];
+	if (completion) {
+		[self.completionForTask removeObjectForKey:taskIdentifier];
+	} else {
+		NSLog(@"UserTimeline downloaded something but the completion was not set for it!");
+	}
 	
 	if ([self.imageIDForTask.allKeys containsObject: taskIdentifier]) {
 		// It's an image
 		NSNumber * imageID = [self.imageIDForTask objectForKey:taskIdentifier];
 		[self.imageIDForTask removeObjectForKey:taskIdentifier];
 		
-		UserTimelineImageDownloadCompletion completion = [self.completionForTask objectForKey:taskIdentifier];
-		if (completion) {
-			completion(data, nil);
-			[self.completionForTask removeObjectForKey:taskIdentifier];
-		} else {
-			[self.delegate timeline:self didFinishDownloadingImage:data forImageID: imageID];
-		}
+		[self.mutableImageData setObject:data forKey:imageID];
+		
+		UserTimelineImageDownloadCompletion c = (UserTimelineImageDownloadCompletion)completion;
+		c(data, nil);
 	} else if ([self.userIDForTask.allKeys containsObject:taskIdentifier]) {
 		// It's a profile image
-		NSNumber * userID = [self.userIDForTask objectForKey:taskIdentifier];
 		[self.userIDForTask removeObjectForKey:taskIdentifier];
 		
-		[self.delegate timeline:self didFinishDownloadingProfileImageData:data forUserID:userID];
+		[self.mutableImageData setObject:data forKey:url];
+		
+		UserTimelineImageDownloadCompletion c = (UserTimelineImageDownloadCompletion)completion;
+		c(data, nil);
 	} else if ([self.imageURLForTask.allKeys containsObject:taskIdentifier]) {
-		// It's an image
+		// It's an image without an image ID
 		[self.imageURLForTask removeObjectForKey:taskIdentifier];
 		
-		UserTimelineImageDownloadCompletion completion = [self.completionForTask objectForKey:taskIdentifier];
-		if (completion) {
-			completion(data, nil);
-		}
+		UserTimelineImageDownloadCompletion c = (UserTimelineImageDownloadCompletion)completion;
+		
+		c(data, nil);
 	}
 	else {
 		NSLog(@"UserTimeline downloaded data and doesn't know what to do with it!");
