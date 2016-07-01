@@ -9,5 +9,8 @@
 #import <UIKit/UIKit.h>
 
 @interface ProfileInfoTableViewCell : UITableViewCell
+@property (strong, nonatomic) IBOutlet UIButton *tweetsButton;
+@property (strong, nonatomic) IBOutlet UIButton *followingButton;
+@property (strong, nonatomic) IBOutlet UIButton *followersButton;
 
 @end

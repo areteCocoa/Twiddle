@@ -15,18 +15,19 @@
 static NSString * headerCellReuse = @"profile_header_image_cell";
 static NSString * infoCellReuse = @"profile_header_info_cell";
 static NSString * actionCellReuse = @"profile_action_cell";
-static NSString * timelineHeaderCellReuse = @"profile_timeline_type_cell";
 
-const CGFloat headerCellHeight = 255;
+const CGFloat dividerCellHeight = 20;
+
+const CGFloat headerCellHeight = 280;
 const CGFloat infoCellHeight = 60;
 const CGFloat actionCellHeight = 40;
-const CGFloat timelineHeaderHeight = 28;
+const CGFloat timelineHeaderHeight = 48;
 
 typedef enum : NSUInteger {
 	ProfileSectionHeader,
 	ProfileSectionInfo,
 	ProfileSectionAction,
-	ProfileSectionTimelineHeaderSection,
+	ProfileSectionTimeline,
 } ProfileTableViewSection;
 
 @interface ProfileTableViewController ()
@@ -66,13 +67,16 @@ typedef enum : NSUInteger {
 	} else if (section == ProfileSectionInfo) {
 		return 1;
 	} else if (section == ProfileSectionAction) {
-		
-	} else if (section == ProfileSectionTimelineHeaderSection) {
-		
+		if ([self.user[@"following"] isEqual:@(YES)]) {
+			return 3;
+		} else {
+			return 1;
+		}
+	} else if (section == ProfileSectionTimeline) {
+		return 1;
 	}
     return 0;
 }
-
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	UITableViewCell * cell;
@@ -117,7 +121,10 @@ typedef enum : NSUInteger {
 		}
 		
 		c.handleLabel.text = self.user[@"name"];
+		[c.handleLabel sizeToFit];
+		
 		c.usernameLabel.text = [NSString stringWithFormat:@"@%@", self.user[@"screen_name"]];
+		[c.usernameLabel sizeToFit];
 		
 		// Format the creation date
 		NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
@@ -133,17 +140,76 @@ typedef enum : NSUInteger {
 		}
 		
 		c.descriptionLabel.text = self.user[@"description"];
+		[c.descriptionLabel sizeToFit];
 								
 	} else if (indexPath.section == ProfileSectionInfo) {
 		cell = [tableView dequeueReusableCellWithIdentifier:infoCellReuse forIndexPath:indexPath];
 		ProfileInfoTableViewCell * c = (ProfileInfoTableViewCell *)cell;
+		[c.tweetsButton setTitle:[NSString stringWithFormat:@"%@\nTweets", self.user[@"statuses_count"]] forState:UIControlStateNormal];
+		[c.tweetsButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
+		[c.followingButton setTitle:[NSString stringWithFormat:@"%@\nFollowing", self.user[@"friends_count"]] forState:UIControlStateNormal];
+		[c.followingButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
+		[c.followersButton setTitle:[NSString stringWithFormat:@"%@\nFollowers", self.user[@"followers_count"]] forState:UIControlStateNormal];
+		[c.followersButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
 	} else if (indexPath.section == ProfileSectionAction) {
 		cell = [tableView dequeueReusableCellWithIdentifier:actionCellReuse forIndexPath:indexPath];
-	} else if (indexPath.section == ProfileSectionTimelineHeaderSection) {
-		cell = [tableView dequeueReusableCellWithIdentifier:timelineHeaderCellReuse forIndexPath:indexPath];
+		
+		// if we're following them we have three buttons: DM, Notifications and Unfollow
+		if ([self.user[@"following"] isEqual:@(YES)]) {
+			if (indexPath.row == 0) {
+				cell.textLabel.text = @"Direct Message";
+			} else if (indexPath.row == 1) {
+				cell.textLabel.text = @"Notifications";
+			} else if (indexPath.row == 2) {
+				cell.textLabel.text = @"Unfollow";
+			}
+		} else {
+			// We're not following them, we only have a single button
+			// if the user is protected we must request to follow them first
+			if ([self.user[@"protected"] isEqual:@(YES)]) {
+				if ([self.user[@"follow_request_sent"] isEqual:@(YES)]) {
+					cell.textLabel.text = @"Follow Request Sent";
+				} else {
+					cell.textLabel.text = @"Send Follow Request";
+				}
+			} else {
+				cell.textLabel.text = @"Follow";
+			}
+		}
+		
+	} else if (indexPath.section == ProfileSectionTimeline) {
+		cell = [tableView dequeueReusableCellWithIdentifier:actionCellReuse forIndexPath:indexPath];
+		cell.textLabel.text = @"aSDF";
 	}
     
     return cell;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+	if (section == 2) {
+		UIView * view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, dividerCellHeight)];
+		view.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
+		return view;
+	} else if (section == 3) {
+		UIView * view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, timelineHeaderHeight)];
+		view.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
+		UISegmentedControl * segmentedControl = [[UISegmentedControl alloc] initWithItems:@[@"Tweets", @"Media", @"Likes"]];
+		segmentedControl.frame = CGRectMake(5, view.frame.size.height - segmentedControl.frame.size.height - 5, view.frame.size.width - 10, segmentedControl.frame.size.height);
+		segmentedControl.selectedSegmentIndex = 0;
+		[view addSubview:segmentedControl];
+		
+		return view;
+	}
+	return nil;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+	if (section == 2) {
+		return dividerCellHeight;
+	} else if (section == 3) {
+		return timelineHeaderHeight;
+	}
+	return 0;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -153,8 +219,8 @@ typedef enum : NSUInteger {
 		return infoCellHeight;
 	} else if (indexPath.section == ProfileSectionAction) {
 		return actionCellHeight;
-	} else if (indexPath.section == ProfileSectionTimelineHeaderSection) {
-		return timelineHeaderHeight;
+	} else if (indexPath.section == ProfileSectionTimeline) {
+		return actionCellHeight;
 	}
 	return 0;
 }
