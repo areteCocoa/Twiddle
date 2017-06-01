@@ -43,6 +43,10 @@ typedef enum : NSUInteger {
     
 	[self.tableView registerNib:[UINib nibWithNibName:@"TweetTextTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:textCellReuse];
 	[self.tableView registerNib:[UINib nibWithNibName:@"TweetImageTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:imageCellReuse];
+	
+	[self.tableView registerNib:[UINib nibWithNibName:@"ProfileHeaderTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:headerCellReuse];
+	[self.tableView registerNib:[UINib nibWithNibName:@"ProfileInfoTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:infoCellReuse];
+	[self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:actionCellReuse];
 }
 
 - (void)didReceiveMemoryWarning {

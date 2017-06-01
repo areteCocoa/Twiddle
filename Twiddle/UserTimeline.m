@@ -70,6 +70,8 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
  */
 @property (nonatomic, retain) NSMutableDictionary<NSNumber *, NSData *> * mutableUserProfileImageData;
 
+
+
 /**
  *  An NSURLSession used for downloading images and other things not downloaded via
  *	the Twitter API
@@ -425,6 +427,10 @@ typedef void(^TweetHandlerCompletion)(NSArray * newData, NSNumber * minID, NSNum
 	} else {
 		NSLog(@"Something else tried to download an image that is already queued to download.");
 	}
+}
+
+- (void)getTimelineForUserID:(NSNumber *)userID withCompletition:(UserTimelineTweetDownloadCompletion)completion {
+	
 }
 
 - (NSArray *)tweets {

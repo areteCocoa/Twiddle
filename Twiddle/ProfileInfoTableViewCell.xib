@@ -1,10 +1,74 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11134" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11106"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="profile_header_info_cell" rowHeight="60" id="lR4-64-y9w" customClass="ProfileInfoTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="60"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="lR4-64-y9w" id="uPv-nY-gIV">
+                <rect key="frame" x="0.0" y="0.0" width="375" height="59.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="characterWrap" translatesAutoresizingMaskIntoConstraints="NO" id="B0h-8c-7jV">
+                        <rect key="frame" x="2" y="-0.5" width="123.5" height="60"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <state key="normal" title="Tweets">
+                            <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="0.80000000000000004" colorSpace="custom" customColorSpace="sRGB"/>
+                        </state>
+                    </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="characterWrap" translatesAutoresizingMaskIntoConstraints="NO" id="7oc-J6-10b">
+                        <rect key="frame" x="249.5" y="-0.5" width="123.5" height="60"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <state key="normal" title="Followers">
+                            <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="0.80000000000000004" colorSpace="custom" customColorSpace="sRGB"/>
+                        </state>
+                    </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="characterWrap" translatesAutoresizingMaskIntoConstraints="NO" id="pWp-M5-8VO">
+                        <rect key="frame" x="125.5" y="0.0" width="124" height="60"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <state key="normal" title="Following">
+                            <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="0.80000000000000004" colorSpace="custom" customColorSpace="sRGB"/>
+                        </state>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="pWp-M5-8VO" firstAttribute="width" secondItem="uPv-nY-gIV" secondAttribute="width" multiplier="0.33" id="CfD-6f-uiQ"/>
+                    <constraint firstItem="B0h-8c-7jV" firstAttribute="centerY" secondItem="pWp-M5-8VO" secondAttribute="centerY" id="ET1-YQ-Qtj"/>
+                    <constraint firstItem="7oc-J6-10b" firstAttribute="leading" secondItem="pWp-M5-8VO" secondAttribute="trailing" constant="138.5" id="NUv-If-R1t"/>
+                    <constraint firstItem="pWp-M5-8VO" firstAttribute="leading" secondItem="B0h-8c-7jV" secondAttribute="trailing" id="PnM-X6-Z9n"/>
+                    <constraint firstItem="B0h-8c-7jV" firstAttribute="centerY" secondItem="uPv-nY-gIV" secondAttribute="centerY" id="WGy-nW-JYT"/>
+                    <constraint firstItem="pWp-M5-8VO" firstAttribute="centerX" secondItem="uPv-nY-gIV" secondAttribute="centerX" id="WI3-yI-Dn7"/>
+                    <constraint firstItem="pWp-M5-8VO" firstAttribute="centerY" secondItem="uPv-nY-gIV" secondAttribute="centerY" id="WeB-cQ-U4s"/>
+                    <constraint firstItem="7oc-J6-10b" firstAttribute="height" secondItem="uPv-nY-gIV" secondAttribute="height" id="asO-ir-vtD"/>
+                    <constraint firstItem="7oc-J6-10b" firstAttribute="leading" secondItem="pWp-M5-8VO" secondAttribute="trailing" id="b61-5u-VoI"/>
+                    <constraint firstItem="7oc-J6-10b" firstAttribute="width" secondItem="uPv-nY-gIV" secondAttribute="width" multiplier="0.33" id="krI-H5-adl"/>
+                    <constraint firstItem="B0h-8c-7jV" firstAttribute="width" secondItem="uPv-nY-gIV" secondAttribute="width" multiplier="0.33" id="rw2-wU-VMT"/>
+                    <constraint firstItem="pWp-M5-8VO" firstAttribute="height" secondItem="uPv-nY-gIV" secondAttribute="height" id="tAc-hI-bfr"/>
+                    <constraint firstItem="7oc-J6-10b" firstAttribute="centerY" secondItem="pWp-M5-8VO" secondAttribute="centerY" id="u0Q-fb-SaL"/>
+                    <constraint firstItem="B0h-8c-7jV" firstAttribute="height" secondItem="uPv-nY-gIV" secondAttribute="height" id="xRD-ou-J14"/>
+                </constraints>
+                <variation key="default">
+                    <mask key="constraints">
+                        <exclude reference="WGy-nW-JYT"/>
+                        <exclude reference="NUv-If-R1t"/>
+                    </mask>
+                </variation>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="followersButton" destination="7oc-J6-10b" id="5Q8-RX-tta"/>
+                <outlet property="followingButton" destination="pWp-M5-8VO" id="R3t-w1-4eo"/>
+                <outlet property="tweetsButton" destination="B0h-8c-7jV" id="sCq-MK-CWl"/>
+            </connections>
+        </tableViewCell>
     </objects>
 </document>

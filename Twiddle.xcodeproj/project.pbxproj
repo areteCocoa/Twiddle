@@ -14,7 +14,6 @@
 		541F6D811D1706BB00740086 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 541F6D801D1706BB00740086 /* Assets.xcassets */; };
 		541F6D841D1706BB00740086 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 541F6D821D1706BB00740086 /* LaunchScreen.storyboard */; };
 		541F6D8F1D1706BB00740086 /* TwiddleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 541F6D8E1D1706BB00740086 /* TwiddleTests.m */; };
-		541F6D9A1D17086900740086 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 541F6D991D17086900740086 /* Main.storyboard */; };
 		541F6D9D1D1708D500740086 /* TimelineTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 541F6D9C1D1708D500740086 /* TimelineTableViewController.m */; };
 		54340F8C1D267A4100BBCE3F /* ProfileTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 54340F8B1D267A4100BBCE3F /* ProfileTableViewController.m */; };
 		54340F8F1D267E5200BBCE3F /* ProfileHeaderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 54340F8E1D267E5200BBCE3F /* ProfileHeaderTableViewCell.m */; };
@@ -29,6 +28,8 @@
 		549D87631D17EF420068DD85 /* TwitterCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 549D87601D17EF420068DD85 /* TwitterCore.framework */; };
 		549D87661D17EFA50068DD85 /* MoPub.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 549D87641D17EFA50068DD85 /* MoPub.framework */; };
 		549D87671D17EFA50068DD85 /* MoPub.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 549D87651D17EFA50068DD85 /* MoPub.bundle */; };
+		54AE63661EDFB9DF00E2E484 /* ProfileHeaderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 54AE63651EDFB9DF00E2E484 /* ProfileHeaderTableViewCell.xib */; };
+		54AE63681EDFBA1900E2E484 /* ProfileInfoTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 54AE63671EDFBA1900E2E484 /* ProfileInfoTableViewCell.xib */; };
 		54D585721D187757008564F1 /* UserTimeline.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D585711D187757008564F1 /* UserTimeline.m */; };
 		54D585781D187DB1008564F1 /* TweetTextTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D585771D187DB1008564F1 /* TweetTextTableViewCell.m */; };
 /* End PBXBuildFile section */
@@ -56,7 +57,6 @@
 		541F6D8A1D1706BB00740086 /* TwiddleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TwiddleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		541F6D8E1D1706BB00740086 /* TwiddleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TwiddleTests.m; sourceTree = "<group>"; };
 		541F6D901D1706BB00740086 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		541F6D991D17086900740086 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		541F6D9B1D1708D500740086 /* TimelineTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimelineTableViewController.h; sourceTree = "<group>"; };
 		541F6D9C1D1708D500740086 /* TimelineTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimelineTableViewController.m; sourceTree = "<group>"; };
 		54340F8A1D267A4100BBCE3F /* ProfileTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileTableViewController.h; sourceTree = "<group>"; };
@@ -76,6 +76,8 @@
 		549D87601D17EF420068DD85 /* TwitterCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TwitterCore.framework; sourceTree = "<group>"; };
 		549D87641D17EFA50068DD85 /* MoPub.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MoPub.framework; sourceTree = "<group>"; };
 		549D87651D17EFA50068DD85 /* MoPub.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = MoPub.bundle; path = MoPub.framework/Versions/A/Resources/MoPub.bundle; sourceTree = "<group>"; };
+		54AE63651EDFB9DF00E2E484 /* ProfileHeaderTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProfileHeaderTableViewCell.xib; sourceTree = "<group>"; };
+		54AE63671EDFBA1900E2E484 /* ProfileInfoTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProfileInfoTableViewCell.xib; sourceTree = "<group>"; };
 		54D585701D187757008564F1 /* UserTimeline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserTimeline.h; sourceTree = "<group>"; };
 		54D585711D187757008564F1 /* UserTimeline.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserTimeline.m; sourceTree = "<group>"; };
 		54D585761D187DB1008564F1 /* TweetTextTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetTextTableViewCell.h; sourceTree = "<group>"; };
@@ -138,7 +140,6 @@
 				541F6D741D1706BB00740086 /* AppDelegate.h */,
 				541F6D751D1706BB00740086 /* AppDelegate.m */,
 				540A5EA91D1E93240042E553 /* TweetCache.xcdatamodeld */,
-				541F6D991D17086900740086 /* Main.storyboard */,
 				549B0D4A1D27034A00F0C9A1 /* Table Cells */,
 				54340F8A1D267A4100BBCE3F /* ProfileTableViewController.h */,
 				54340F8B1D267A4100BBCE3F /* ProfileTableViewController.m */,
@@ -182,8 +183,10 @@
 				549B0D481D27031100F0C9A1 /* TweetTextTableViewCell.xib */,
 				54340F8D1D267E5200BBCE3F /* ProfileHeaderTableViewCell.h */,
 				54340F8E1D267E5200BBCE3F /* ProfileHeaderTableViewCell.m */,
+				54AE63651EDFB9DF00E2E484 /* ProfileHeaderTableViewCell.xib */,
 				54340F901D267E6900BBCE3F /* ProfileInfoTableViewCell.h */,
 				54340F911D267E6900BBCE3F /* ProfileInfoTableViewCell.m */,
+				54AE63671EDFBA1900E2E484 /* ProfileInfoTableViewCell.xib */,
 			);
 			name = "Table Cells";
 			sourceTree = "<group>";
@@ -274,9 +277,10 @@
 				549B0D491D27031100F0C9A1 /* TweetTextTableViewCell.xib in Resources */,
 				549B0D4C1D2703E700F0C9A1 /* TweetImageTableViewCell.xib in Resources */,
 				549D87621D17EF420068DD85 /* TwitterKitResources.bundle in Resources */,
-				541F6D9A1D17086900740086 /* Main.storyboard in Resources */,
 				549D87671D17EFA50068DD85 /* MoPub.bundle in Resources */,
+				54AE63681EDFBA1900E2E484 /* ProfileInfoTableViewCell.xib in Resources */,
 				541F6D841D1706BB00740086 /* LaunchScreen.storyboard in Resources */,
+				54AE63661EDFB9DF00E2E484 /* ProfileHeaderTableViewCell.xib in Resources */,
 				541F6D811D1706BB00740086 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

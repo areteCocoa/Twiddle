@@ -15,7 +15,7 @@
 
 static NSString * loadMoreReuse = @"load_more_cell";
 
-static CGFloat textCellHeight = 90;
+static CGFloat textCellHeight = 105;
 static CGFloat loadMoreCellHeight = 40;
 
 typedef enum : NSUInteger {
@@ -42,8 +42,7 @@ typedef enum : NSUInteger {
 	
 	[self.tableView registerNib:[UINib nibWithNibName:@"TweetTextTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:textCellReuse];
 	[self.tableView registerNib:[UINib nibWithNibName:@"TweetImageTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:imageCellReuse];
-	
-    self.view.backgroundColor = [UIColor blueColor];
+	[self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:loadMoreReuse];
     
     self.userProfileImageCache = [[NSMutableDictionary alloc] init];
 	self.imageCache = [NSMutableDictionary dictionary];
@@ -290,7 +289,10 @@ typedef enum : NSUInteger {
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-	[self performSegueWithIdentifier:@"profile_segue" sender:self];
+	ProfileTableViewController * controller = [[ProfileTableViewController alloc] initWithStyle:UITableViewStylePlain];
+	NSDictionary * user = self.timeline.tweets[indexPath.row][@"user"];
+	controller.user = user;
+	[self.navigationController pushViewController:controller animated:YES];
 }
 
 #pragma mark - UserTimelineDelegate

@@ -78,4 +78,8 @@ typedef void(^UserTimelineImageDownloadCompletion)(NSData * imageData, NSError *
 
 - (void)getImageWithURL: (NSString *)url withCompletion: (UserTimelineImageDownloadCompletion)completion;
 
+- (void)getTimelineForUserID: (NSNumber *)userID withCompletition: (UserTimelineTweetDownloadCompletion)completion;
+
+//- (NSArray *)getLocalTimelineForUserID: (NSNumber *)userID;
+
 @end

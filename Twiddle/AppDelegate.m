@@ -12,6 +12,8 @@
 #import <TwitterKit/TwitterKit.h>
 #import <MoPub/MoPub.h>
 
+#import "TimelineTableViewController.h"
+
 @interface AppDelegate ()
 
 @end
@@ -30,6 +32,19 @@
     [[Twitter sharedInstance] startWithConsumerKey:@"fbmle15DlXrs3MHuh8vk48laC" consumerSecret:@"YH8VJcDuq57Wv3J3oVUMy7ojHCK3VPQwIMPSpGp0oQv1mwklS5"];
     
     [Fabric with:@[[Crashlytics class], [Twitter class], [MoPub class]]];
+	
+	
+	// Initialize the root view controller and it's children
+	UITabBarController * tabBarController = [[UITabBarController alloc] init];
+	
+	TimelineTableViewController * timelineController = [[TimelineTableViewController alloc] initWithStyle:UITableViewStylePlain];
+	UINavigationController * timelineNavigationController = [[UINavigationController alloc] initWithRootViewController:timelineController];
+	
+	tabBarController.viewControllers = @[timelineNavigationController];
+	
+	self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+	self.window.rootViewController = tabBarController;
+	[self.window makeKeyAndVisible];
     
     return YES;
 }
